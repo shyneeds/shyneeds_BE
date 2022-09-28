@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:mysql://shineeds-db-instance.cghfkoj2aznr.ap-northeast-2.rds.amazonaws.com:3306/shyneeds?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull
+    username:
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: none
+
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always
+
+  # swagger3 적용
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
