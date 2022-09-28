@@ -1,4 +1,4 @@
-package com.example.shyneeds_be.controller;
+package com.example.shyneeds_be.global.controller;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
