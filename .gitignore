@@ -21,7 +21,6 @@ bin/
 *.yml
 
 ### IntelliJ IDEA ###
-/src/main/resources/application.yml
 .idea
 *.iws
 *.iml
