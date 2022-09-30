@@ -1,4 +1,4 @@
-package com.example.shyneeds_be.domain.user.dto;
+package com.example.shyneeds_be.global.security.jwt.Oauth.dto;
 
 import lombok.Data;
 
