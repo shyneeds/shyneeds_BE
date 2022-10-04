@@ -1,6 +1,12 @@
 package com.example.shyneeds_be.domain.travel_package.service;
 
+import com.example.shyneeds_be.domain.category.model.entity.Category;
+import com.example.shyneeds_be.domain.category.model.entity.SubCategory;
+import com.example.shyneeds_be.domain.category.model.response.CategoryResponseDto;
+import com.example.shyneeds_be.domain.category.model.response.SubCategoryResponseDto;
+import com.example.shyneeds_be.domain.category.repository.CategoryRepository;
 import com.example.shyneeds_be.domain.travel_package.model.dto.request.TravelPackageRegisterRequestDto;
+import com.example.shyneeds_be.domain.travel_package.model.dto.response.TravelPackageResponseDto;
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.TravelPackage;
 import com.example.shyneeds_be.domain.travel_package.repository.TravelPackageRepository;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
@@ -14,7 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,6 +33,7 @@ public class TravelPackageService {
 
     private final ItemS3Uploader itemS3Uploader;
     private final TravelPackageRepository travelPackageRepository;
+    private final CategoryRepository categoryRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -100,6 +110,67 @@ public class TravelPackageService {
         return null;
     }
 
+    /*--------------------------------[어드민] 상품 리스트 조회------------------------------------ */
+    public ApiResponseDto<List<TravelPackageResponseDto>> getAdminList() {
+       try{
+
+           List<TravelPackageResponseDto> travelPackageResponseDtoList = travelPackageRepository.findAll().stream().map(this::response).toList();
+
+           return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", travelPackageResponseDtoList);
+       } catch (Exception e){
+           return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다." + e.getMessage());
+       }
+    }
+
+    private TravelPackageResponseDto response(TravelPackage travelPackage){
+
+        List<CategoryResponseDto> categoryResponseDtoList = new ArrayList<>();
+
+        StringTokenizer st = new StringTokenizer(travelPackage.getCategoryIds(), ",");
+        while(st.hasMoreElements()){
+            Optional<Category> optionalCategory = categoryRepository.findById(Long.valueOf(st.nextToken()));
+            if(optionalCategory.isPresent() && optionalCategory != null){
+                categoryResponseDtoList.add(responseCategoryResponse(optionalCategory.get()));
+            }
+        }
+
+
+
+        String imageDir = "https://shyneeds.s3.ap-northeast-2.amazonaws.com/package/"+
+                travelPackage.getTitle();
+
+        List<String> descriptionImageUrlList = new ArrayList<>();
+        descriptionImageUrlList.add(imageDir + "/description/" + travelPackage.getDescriptionImage());
+
+        // search keyword
+        List<String> searchKeywordList = new ArrayList<>();
+        StringTokenizer skSt = new StringTokenizer(travelPackage.getSearchKeyword());
+        while (skSt.hasMoreElements()) {
+            searchKeywordList.add(skSt.nextToken());
+        }
+
+        return TravelPackageResponseDto.builder()
+                .id(travelPackage.getId())
+                .title(travelPackage.getTitle())
+                .categoryResponseDtoList(categoryResponseDtoList)
+                .mainImage(imageDir +"/main/"
+                        +travelPackage.getMainImage())
+                .descriptionImage(descriptionImageUrlList)
+                .price(travelPackage.getPrice())
+                .summary(travelPackage.getSummary())
+                .requiredOptionName(travelPackage.getRequiredOptionName())
+                .requiredOptionValues(travelPackage.getRequiredOptionValues())
+                .optionalName(travelPackage.getOptionalName())
+                .optionalValues(travelPackage.getOptionalValues())
+                .flightInfo(travelPackage.getFlightInfo())
+                .soldoutFlg(travelPackage.isSoldoutFlg())
+                .dispFlg(travelPackage.isDispFlg())
+                .createdAt(travelPackage.getCreatedAt())
+                .updatedAt(travelPackage.getUpdatedAt())
+                .searchKeyword(searchKeywordList)
+                .build();
+    }
+
     private String removeBracket(List list){
         String listString = list.toString();
         listString = listString.replaceAll("\\[", "");
@@ -107,6 +178,20 @@ public class TravelPackageService {
 
         return listString;
     }
+
+    private CategoryResponseDto responseCategoryResponse(Category category){
+
+        return CategoryResponseDto.builder()
+                .id(category.getId())
+                .title(category.getTitle())
+                .subCategoryResponseDtoList(null)
+                .dispFlg(category.isDispFlg())
+                .createdAt(category.getCreatedAt())
+                .updatedAt(category.getUpdatedAt())
+                .build();
+
+    }
+
 
 
 }

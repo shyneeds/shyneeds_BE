@@ -1,6 +1,7 @@
 package com.example.shyneeds_be.domain.travel_package.controller;
 
 import com.example.shyneeds_be.domain.travel_package.model.dto.request.TravelPackageRegisterRequestDto;
+import com.example.shyneeds_be.domain.travel_package.model.dto.response.TravelPackageResponseDto;
 import com.example.shyneeds_be.domain.travel_package.service.TravelPackageService;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;
@@ -35,7 +36,9 @@ public class TravelPackageController {
     }
 
 
- /*   @ApiOperation(value = "[어드민] 상품 조회")
+    @ApiOperation(value = "[어드민] 상품 조회")
     @GetMapping("/admin")
-    public ApiResponseDto<>*/
+    public ApiResponseDto<List<TravelPackageResponseDto>> getPackage(){
+        return travelPackageService.getAdminList();
+    }
 }
