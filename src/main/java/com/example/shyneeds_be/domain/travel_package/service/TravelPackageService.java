@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class TravelPackageService {
 
     private final ItemS3Uploader itemS3Uploader;
@@ -111,7 +113,7 @@ public class TravelPackageService {
     }
 
     /*--------------------------------[어드민] 상품 리스트 조회------------------------------------ */
-    public ApiResponseDto<List<TravelPackageResponseDto>> getAdminList() {
+    public ApiResponseDto<List<TravelPackageResponseDto>> getAdminPackageList() {
        try{
 
            List<TravelPackageResponseDto> travelPackageResponseDtoList = travelPackageRepository.findAll().stream().map(this::response).toList();
@@ -121,6 +123,50 @@ public class TravelPackageService {
            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다." + e.getMessage());
        }
     }
+
+    /*--------------------------------[어드민] 상품 상세 조회------------------------------------ */
+    public ApiResponseDto<TravelPackageResponseDto> getAdminPackage(Long id) {
+        try{
+            Optional<TravelPackage> optionalTravelPackage = travelPackageRepository.findById(id);
+
+            if(optionalTravelPackage.isEmpty()){
+                return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "해당 상품을 찾을 수 없습니다.");
+            } else {
+                TravelPackageResponseDto travelPackageResponseDto = response(optionalTravelPackage.get());
+                return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", travelPackageResponseDto);
+            }
+
+
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다." + e.getMessage());
+        }
+    }
+
+    /*--------------------------------[어드민] 상품 삭제 - soft delete------------------------------------ */
+    public ApiResponseDto deletedPackage(Long id) {
+        try{
+
+            // 상품 조회
+            Optional<TravelPackage> optionalTravelPackage = travelPackageRepository.findById(id);
+            if(optionalTravelPackage.isEmpty()){
+                return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "해당 상품을 찾을 수 없습니다.");
+            } else {
+
+                // 삭제 및 저장
+                TravelPackage deletedTravelPackage = optionalTravelPackage.get().deleted();
+                travelPackageRepository.save(deletedTravelPackage);
+
+                return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "상품 삭제에 성공했습니다.");
+            }
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "상품 삭제에 실패했습니다." + e.getMessage());
+        }
+    }
+
+
+
+
+
 
     private TravelPackageResponseDto response(TravelPackage travelPackage){
 
