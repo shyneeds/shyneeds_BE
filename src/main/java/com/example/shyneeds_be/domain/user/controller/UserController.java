@@ -1,10 +1,9 @@
 package com.example.shyneeds_be.domain.user.controller;
 
-import com.example.shyneeds_be.domain.user.dto.SignupRequestDto;
+import com.example.shyneeds_be.domain.user.model.dto.SignupRequestDto;
 import com.example.shyneeds_be.domain.user.service.UserService;
 import com.example.shyneeds_be.global.auth.dto.AccessTokenResponseDto;
 import com.example.shyneeds_be.global.auth.dto.LoginRequestDto;
-import com.example.shyneeds_be.global.auth.dto.TokenInfoDto;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import lombok.RequiredArgsConstructor;

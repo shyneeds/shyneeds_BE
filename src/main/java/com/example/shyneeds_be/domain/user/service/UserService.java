@@ -1,7 +1,7 @@
 package com.example.shyneeds_be.domain.user.service;
 
-import com.example.shyneeds_be.domain.user.dto.SignupRequestDto;
-import com.example.shyneeds_be.domain.user.entity.User;
+import com.example.shyneeds_be.domain.user.model.dto.SignupRequestDto;
+import com.example.shyneeds_be.domain.user.model.entity.User;
 import com.example.shyneeds_be.domain.user.repository.UserRepository;
 import com.example.shyneeds_be.global.auth.dto.AccessTokenResponseDto;
 import com.example.shyneeds_be.global.auth.dto.LoginRequestDto;
@@ -14,8 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.Access;
 
 @Service
 @RequiredArgsConstructor

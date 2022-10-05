@@ -1,4 +1,4 @@
-package com.example.shyneeds_be.domain.user.entity;
+package com.example.shyneeds_be.domain.user.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.example.shyneeds_be.domain.user.dto;
+package com.example.shyneeds_be.domain.user.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
