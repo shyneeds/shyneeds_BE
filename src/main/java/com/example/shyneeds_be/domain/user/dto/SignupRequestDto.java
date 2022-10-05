@@ -4,13 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.sql.Date;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class JoinRequestDto {
+public class SignupRequestDto {
     private String email;
     private String password;
-    private String userName;
-    private String birthDay;
+    private String name;
+    private Date birthday;
     private String gender;
 }

@@ -1,7 +1,7 @@
-package com.example.shyneeds_be.global.service;
+package com.example.shyneeds_be.global.auth.service;
 
-import com.example.shyneeds_be.global.dto.KakaoProfile;
-import com.example.shyneeds_be.global.dto.OauthToken;
+import com.example.shyneeds_be.global.auth.dto.KakaoProfile;
+import com.example.shyneeds_be.global.auth.dto.OauthToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,14 +16,14 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class OauthService {
-    @Value("${kakao.client_id}")
-    String client_id;
+    @Value("${kakao.client-id}")
+    String clientId;
 
-    @Value("${kakao.client_secret}")
-    String client_secret;
+    @Value("${kakao.client-secret}")
+    String clientSecret;
 
-    @Value("${shyneeds.front_url}")
-    String front_url;
+    @Value("${kakao.front-url}")
+    String frontUrl;
 
     public OauthToken getAccessToken(String code) {
 
@@ -37,10 +37,10 @@ public class OauthService {
         // HttpBody 오브젝트 생성
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
-        params.add("client_id", client_id);
-        params.add("redirect_uri", front_url + "/oauth/kakao/callback");
+        params.add("client_id", clientId);
+        params.add("redirect_uri", frontUrl + "/oauth/kakao/callback");
         params.add("code", code);
-        params.add("client_secret", client_secret);
+        params.add("client_secret", clientSecret);
 
         // HttpHeader 와 HttpBody 정보를 하나의 오브젝트에 담음
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =

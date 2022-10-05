@@ -1,4 +1,4 @@
-package com.example.shyneeds_be.global.dto;
+package com.example.shyneeds_be.global.auth.dto;
 
 import lombok.Data;
 

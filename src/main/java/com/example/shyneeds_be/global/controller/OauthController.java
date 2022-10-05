@@ -1,12 +1,16 @@
-package com.example.shyneeds_be.global.auth.controller;
+package com.example.shyneeds_be.global.controller;
 
 import com.example.shyneeds_be.global.auth.dto.KakaoProfile;
+import com.example.shyneeds_be.global.auth.dto.LoginRequestDto;
 import com.example.shyneeds_be.global.auth.dto.OauthToken;
+import com.example.shyneeds_be.global.auth.dto.TokenInfoDto;
 import com.example.shyneeds_be.global.auth.service.OauthService;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api")
@@ -25,4 +29,7 @@ public class OauthController {
 
         return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(),"카카오프로필" ,kakaoProfile);
     }
+
+
+
 }
