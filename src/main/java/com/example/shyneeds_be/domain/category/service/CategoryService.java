@@ -24,11 +24,26 @@ public class CategoryService {
     private final SubCategoryRepository subCategoryRepository;
     private final ThirdCategoryRepository thirdCategoryRepository;
 
+    // 카테고리 리스트 조회
     public ApiResponseDto<List<CategoryResponseDto>> getCategoryList(){
         try{
 
             List<CategoryResponseDto> categoryResponseDtoList = categoryRepository.findAll().stream().map(this::response).toList();
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", categoryResponseDtoList);
+        } catch(Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다." + e.getMessage());
+        }
+    }
+
+
+    // 메인 카테고리로 서브 카테고리 조회
+    public ApiResponseDto<List<SubCategoryResponseDto>> getSubCategory(Long categoryId) {
+        try{
+
+            List<SubCategoryResponseDto> subCategoryResponseDtoList = subCategoryRepository.findByCategoryId(categoryId).stream().map(this::responseSubCategory).toList();
+
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", subCategoryResponseDtoList);
+
         } catch(Exception e){
             return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다." + e.getMessage());
         }
@@ -92,4 +107,6 @@ public class CategoryService {
                 .updatedAt(thirdCategory.getUpdatedAt())
                 .build();
     }
+
+
 }
