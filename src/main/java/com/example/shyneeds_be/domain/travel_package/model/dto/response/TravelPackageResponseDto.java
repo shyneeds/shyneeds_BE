@@ -78,4 +78,7 @@ public class TravelPackageResponseDto {
     @ApiModelProperty(value = "검색 키워드 리스트", required = false, example = "여자끼리,5070끼리")
     private List<String> searchKeyword;
 
+    @ApiModelProperty(value = "삭제 여부", required = true, example = "false or 0")
+    private boolean deletedFlg;
+
 }

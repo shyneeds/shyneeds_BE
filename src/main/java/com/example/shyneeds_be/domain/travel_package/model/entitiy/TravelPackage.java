@@ -79,4 +79,14 @@ public class TravelPackage {
     @Column(name = "search_keyword")
     private String searchKeyword;
 
+    @Column(name = "deleted_flg")
+    private boolean deletedFlg;
+
+
+    // 상품 삭제
+    public TravelPackage deleted(){
+        this.deletedFlg = true;
+        return this;
+    }
+
 }

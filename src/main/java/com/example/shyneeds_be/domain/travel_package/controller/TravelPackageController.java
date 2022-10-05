@@ -36,9 +36,22 @@ public class TravelPackageController {
     }
 
 
-    @ApiOperation(value = "[어드민] 상품 조회")
+    @ApiOperation(value = "[어드민] 상품 리스트 조회")
     @GetMapping("/admin")
-    public ApiResponseDto<List<TravelPackageResponseDto>> getPackage(){
-        return travelPackageService.getAdminList();
+    public ApiResponseDto<List<TravelPackageResponseDto>> getPackageList(){
+        return travelPackageService.getAdminPackageList();
+    }
+
+    @ApiOperation(value = "[어드민] 상품 조회")
+    @GetMapping("/admin/{id}")
+    public ApiResponseDto<TravelPackageResponseDto> getPackage(@PathVariable("id") Long id){
+        return travelPackageService.getAdminPackage(id);
+    }
+
+
+    @ApiOperation(value = "[어드민] 상품 삭제")
+    @GetMapping("/admin/delete/{id}")
+    public ApiResponseDto deletePackage(@PathVariable("id") Long id){
+        return travelPackageService.deletedPackage(id);
     }
 }
