@@ -46,7 +46,7 @@ public class User {
     @CreationTimestamp
     private Timestamp createdAt;
 
-    @Column(name = "refreshToken")
+    @Column(name = "refresh_token")
     private String refreshToken;
 
     @Builder
