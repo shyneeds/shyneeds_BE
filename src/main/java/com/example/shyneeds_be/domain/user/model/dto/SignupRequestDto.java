@@ -13,6 +13,8 @@ public class SignupRequestDto {
     private String email;
     private String password;
     private String name;
-    private Date birthday;
+    private String year;
+    private String month;
+    private String day;
     private String gender;
 }

@@ -15,6 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -39,18 +43,28 @@ public class UserService {
         return accessTokenResponseDto;
     }
 
-    public void signup(SignupRequestDto signupRequestDto) {
+    public void signup(SignupRequestDto signupRequestDto){
         if(userRepository.findByEmail(signupRequestDto.getEmail()) != null){
             throw new RuntimeException("이미 가입된 유저입니다.");
         }
 
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
 
+        Date birthday = null;
+        try {
+            String strBirthday = signupRequestDto.getYear()+"-"+signupRequestDto.getMonth()+"-"+signupRequestDto.getDay();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            birthday = dateFormat.parse(strBirthday);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+
         User user = User.builder()
                 .email(signupRequestDto.getEmail())
                 .password(password)
                 .name(signupRequestDto.getName())
-                .birthday(signupRequestDto.getBirthday())
+                .birthday(birthday)
                 .gender(signupRequestDto.getGender())
                 .role("USER")
                 .build();

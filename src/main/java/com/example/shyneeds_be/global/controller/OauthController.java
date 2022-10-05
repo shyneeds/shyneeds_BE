@@ -24,7 +24,10 @@ public class OauthController {
 
         // 넘어온 인가 코드를 통해 access_token 발급
         OauthToken oauthToken = oauthService.getAccessToken(code);
+
+        // 카카오 유저 데이터
         KakaoProfile kakaoProfile = oauthService.findKakaoProfile(oauthToken);
+
 
 
         return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(),"카카오프로필" ,kakaoProfile);
