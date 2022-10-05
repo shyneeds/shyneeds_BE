@@ -1,7 +1,7 @@
-package com.example.shyneeds_be.global.security.jwt.Oauth.service;
+package com.example.shyneeds_be.global.service;
 
-import com.example.shyneeds_be.global.security.jwt.Oauth.dto.KakaoProfile;
-import com.example.shyneeds_be.global.security.jwt.Oauth.dto.OauthToken;
+import com.example.shyneeds_be.global.dto.KakaoProfile;
+import com.example.shyneeds_be.global.dto.OauthToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,10 +16,10 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class OauthService {
-    @Value("${kakao.clientId}")
+    @Value("${kakao.client_id}")
     String client_id;
 
-    @Value("${kakao.secret}")
+    @Value("${kakao.client_secret}")
     String client_secret;
 
     @Value("${shyneeds.front_url}")
@@ -68,12 +68,12 @@ public class OauthService {
 
 
 
-    public KakaoProfile findKakaoProfile(String token) {
+    public KakaoProfile findKakaoProfile(OauthToken token) {
 
         RestTemplate rt = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + token);
+        headers.add("Authorization", "Bearer " + token.getAccess_token());
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest =
