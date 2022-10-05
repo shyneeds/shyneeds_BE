@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .authorizeRequests()
                 .antMatchers("/login","/","/signup").permitAll()
-                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/admin/**").hasAnyAuthority("ADMIN")
                 .antMatchers("/user/**").authenticated()
 
                 .and()
