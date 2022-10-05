@@ -1,6 +1,5 @@
 package com.example.shyneeds_be.global.controller;
 
-import com.example.shyneeds_be.domain.user.entity.User;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import io.swagger.annotations.ApiOperation;
