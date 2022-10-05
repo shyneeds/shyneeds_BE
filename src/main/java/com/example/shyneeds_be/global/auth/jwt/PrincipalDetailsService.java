@@ -1,6 +1,6 @@
 package com.example.shyneeds_be.global.auth.jwt;
 
-import com.example.shyneeds_be.domain.user.entity.User;
+import com.example.shyneeds_be.domain.user.model.entity.User;
 import com.example.shyneeds_be.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
