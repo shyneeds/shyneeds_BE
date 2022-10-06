@@ -42,6 +42,9 @@ public class User {
     @Column(name = "role")
     private String role;
 
+    @Column(name = "kakao_id")
+    private Long kakaoId;
+
     @Column(name = "created_at")
     @CreationTimestamp
     private Timestamp createdAt;
@@ -50,13 +53,14 @@ public class User {
     private String refreshToken;
 
     @Builder
-    public User(String email, String password, String name, Date birthday, String gender, String role){
+    public User(String email, String password, String name, Date birthday, String gender, String role, Long kakaoId){
         this.email = email;
         this.password = password;
         this.name = name;
         this.birthday = birthday;
         this.gender = gender;
         this.role = role;
+        this.kakaoId = kakaoId;
     }
 
     public void saveRefreshToken(String refreshToken){

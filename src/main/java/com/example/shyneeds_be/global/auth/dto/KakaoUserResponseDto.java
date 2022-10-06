@@ -5,7 +5,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class KakaoProfile {
+public class KakaoUserResponseDto {
 
     public Long id;
     public Properties properties;

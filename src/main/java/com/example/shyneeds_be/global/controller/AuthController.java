@@ -10,10 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-public class OauthController {
+public class AuthController {
 
     private final OauthService oauthService;
-    private final UserService userService;
     @PostMapping("/login")
     public ApiResponseDto<AuthResponseDto> login(@RequestBody LoginRequestDto loginRequestDto){
         AuthResponseDto accessToken = oauthService.login(loginRequestDto);

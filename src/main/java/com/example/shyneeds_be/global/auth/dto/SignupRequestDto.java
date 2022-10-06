@@ -1,4 +1,4 @@
-package com.example.shyneeds_be.domain.user.model.dto;
+package com.example.shyneeds_be.global.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

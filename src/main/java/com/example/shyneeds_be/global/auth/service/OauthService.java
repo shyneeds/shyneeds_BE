@@ -1,20 +1,29 @@
 package com.example.shyneeds_be.global.auth.service;
 
-import com.example.shyneeds_be.global.auth.dto.KakaoProfile;
-import com.example.shyneeds_be.global.auth.dto.OauthToken;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.shyneeds_be.domain.user.model.entity.User;
+import com.example.shyneeds_be.domain.user.repository.UserRepository;
+import com.example.shyneeds_be.global.auth.dto.AuthRequestDto;
+import com.example.shyneeds_be.global.auth.dto.AuthResponseDto;
+import com.example.shyneeds_be.global.auth.dto.LoginRequestDto;
+import com.example.shyneeds_be.global.auth.dto.SignupRequestDto;
+import com.example.shyneeds_be.global.auth.jwt.AuthToken;
+import com.example.shyneeds_be.global.auth.jwt.AuthTokenProvider;
+import com.example.shyneeds_be.global.auth.oauth.ClientKakao;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Service
+@RequiredArgsConstructor
 public class OauthService {
     @Value("${kakao.client-id}")
     String clientId;
@@ -25,78 +34,86 @@ public class OauthService {
     @Value("${kakao.front-url}")
     String frontUrl;
 
-    public OauthToken getAccessToken(String code) {
+    private final UserRepository userRepository;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final PasswordEncoder passwordEncoder;
+    private final ClientKakao clientKakao;
+    private final AuthTokenProvider authTokenProvider;
 
-        // POST 방식으로 key=value 데이터 요청
-        RestTemplate rt = new RestTemplate();
+    @Transactional
+    public AuthResponseDto login(LoginRequestDto loginRequestDto){
 
-        // HttpHeader 오브젝트 생성
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword());
 
-        // HttpBody 오브젝트 생성
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "authorization_code");
-        params.add("client_id", clientId);
-        params.add("redirect_uri", frontUrl + "/oauth/kakao/callback");
-        params.add("code", code);
-        params.add("client_secret", clientSecret);
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        // HttpHeader 와 HttpBody 정보를 하나의 오브젝트에 담음
-        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
-                new HttpEntity<>(params, headers);
+        AuthToken token = authTokenProvider.generateToken(authentication, loginRequestDto.getEmail());
 
-        // Http 요청 (POST 방식) 후, response 변수의 응답을 받음
-        ResponseEntity<String> accessTokenResponse = rt.exchange(
-                "https://kauth.kakao.com/oauth/token",
-                HttpMethod.POST,
-                kakaoTokenRequest,
-                String.class
-        );
+        User user = userRepository.findByEmail(loginRequestDto.getEmail());
 
-        // JSON 응답을 객체로 변환
-        ObjectMapper objectMapper = new ObjectMapper();
-        OauthToken oauthToken = null;
-        try {
-            oauthToken = objectMapper.readValue(accessTokenResponse.getBody(), OauthToken.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        user.saveRefreshToken(token.getToken().getRefreshToken());
 
-        return oauthToken;
+        AuthResponseDto authResponseDto = new AuthResponseDto(token.getToken().getAccessToken());
+
+        return authResponseDto;
     }
 
-
-
-    public KakaoProfile findKakaoProfile(OauthToken token) {
-
-        RestTemplate rt = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + token.getAccess_token());
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-
-        HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest =
-                new HttpEntity<>(headers);
-
-        // Http 요청 (POST 방식) 후, response 변수에 응답을 받음
-        ResponseEntity<String> kakaoProfileResponse = rt.exchange(
-                "https://kapi.kakao.com/v2/user/me",
-                HttpMethod.POST,
-                kakaoProfileRequest,
-                String.class
-        );
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        KakaoProfile kakaoProfile = null;
-        try {
-            kakaoProfile = objectMapper.readValue(kakaoProfileResponse.getBody(), KakaoProfile.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+    @Transactional
+    public void signup(SignupRequestDto signupRequestDto){
+        if(userRepository.findByEmail(signupRequestDto.getEmail()) != null){
+            throw new RuntimeException("이미 가입된 유저입니다.");
         }
 
-        return kakaoProfile;
+        String password = passwordEncoder.encode(signupRequestDto.getPassword());
+
+        Date birthday = null;
+        try {
+            String strBirthday = signupRequestDto.getYear()+"-"+signupRequestDto.getMonth()+"-"+signupRequestDto.getDay();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            birthday = dateFormat.parse(strBirthday);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        User user = User.builder()
+                .email(signupRequestDto.getEmail())
+                .password(password)
+                .name(signupRequestDto.getName())
+                .birthday(birthday)
+                .gender(signupRequestDto.getGender())
+                .role("USER")
+                .build();
+
+        userRepository.save(user);
     }
 
+    @Transactional
+    public AuthResponseDto kakaoLogin(AuthRequestDto authRequestDto) {
+        User kakaoUser = clientKakao.getUserData(authRequestDto.getAccessToken());
+        Long kakaoId = kakaoUser.getKakaoId();
+        AuthToken token = null;
+
+
+        if (userRepository.findByKakaoId(kakaoId) == null){
+            token = authTokenProvider.createAppToken(kakaoUser.getEmail(), "USER");
+            kakaoUser.builder()
+                    .role("USER")
+                    .build();
+
+            kakaoUser.saveRefreshToken(token.getToken().getRefreshToken());
+            userRepository.save(kakaoUser);
+
+        } else {
+            token = authTokenProvider.createToken(kakaoUser.getEmail(), userRepository.findByKakaoId(kakaoId).getRole());
+            User user = userRepository.findByKakaoId(kakaoId);
+            user.saveRefreshToken(token.getToken().getRefreshToken());
+            userRepository.save(user);
+        }
+
+        return AuthResponseDto.builder()
+                .accessToken(token.getToken().getAccessToken())
+                .build();
+    }
 
 }
