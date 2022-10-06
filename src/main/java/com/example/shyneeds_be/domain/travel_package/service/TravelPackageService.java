@@ -221,6 +221,7 @@ public class TravelPackageService {
         String listString = list.toString();
         listString = listString.replaceAll("\\[", "");
         listString = listString.replaceAll("\\]", "");
+        listString = listString.replaceAll(" ", "");
 
         return listString;
     }
