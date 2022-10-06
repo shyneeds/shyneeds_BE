@@ -81,4 +81,7 @@ public class TravelPackageResponseDto {
     @ApiModelProperty(value = "삭제 여부", required = true, example = "false or 0")
     private boolean deletedFlg;
 
+    @ApiModelProperty(value = "메인배너 노출 여부", required = true, example = "")
+    private boolean mainBannerFlg;
+
 }
