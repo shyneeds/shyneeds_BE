@@ -13,6 +13,9 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +29,17 @@ public class SecurityConfig {
         http
                 .httpBasic().disable()
                 .csrf().disable()
+                .cors().configurationSource(
+                        request -> {
+                            CorsConfiguration cors = new CorsConfiguration();
+                            cors.setAllowedOrigins(List.of("*", "http://localhost:3000"));
+                            cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                            cors.setAllowedHeaders(List.of("*"));
+
+                            return cors;
+                        }
+                )
+                .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
 

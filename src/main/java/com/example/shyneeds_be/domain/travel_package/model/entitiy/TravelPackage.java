@@ -82,6 +82,9 @@ public class TravelPackage {
     @Column(name = "deleted_flg")
     private boolean deletedFlg;
 
+    @Column(name = "main_banner_flg")
+    private boolean mainBannerFlg;
+
 
     // 상품 삭제
     public TravelPackage deleted(){
