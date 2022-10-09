@@ -1,5 +1,8 @@
 package com.example.shyneeds_be.domain.travel_package.model.entitiy;
 
+import com.example.shyneeds_be.domain.cart.model.entity.Cart;
+import com.example.shyneeds_be.domain.reservation_package.model.entity.ReservationPackage;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +12,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "travel_package")
@@ -85,6 +89,13 @@ public class TravelPackage {
     @Column(name = "main_banner_flg")
     private boolean mainBannerFlg;
 
+    @JsonBackReference
+    @OneToMany(mappedBy = "travelPackage", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ReservationPackage> reservationPackages = new ArrayList<>();
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "travelPackage", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Cart> carts = new ArrayList<>();
 
     // 상품 삭제
     public TravelPackage deleted(){
