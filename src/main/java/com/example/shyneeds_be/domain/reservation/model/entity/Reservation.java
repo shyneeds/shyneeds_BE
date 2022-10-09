@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -19,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 public class Reservation {
 
     @Id
@@ -26,20 +28,26 @@ public class Reservation {
     private Long id;
 
     @Column(name = "payment_method")
-    private String paymentMethod;
+    private String paymentMethod;  // 결제수단
 
     @Column(name = "payment_account_number")
-    private String paymentAccountNumber;
+    private String paymentAccountNumber;  // 계좌번호
 
     @Column(name = "total_reservation_amount")
-    private Long totalReservationAmount;
+    private Long totalReservationAmount;  // 총 예약 금액
 
     @Column(name = "reservation_number")
-    private Long reservationNumber;
+    private Long reservationNumber;  // 예약번호
+
+//    @Column(name = "입금자명")
+//    private String = 입금자명;  // 입금자명
+//
+//    @Column(name = "약관 동의여부")
+//    private Boolean = 약관동의여부;  // 약관동의 여부
 
     @Column(name = "reservation_status")
     @Enumerated(EnumType.STRING)
-    private ReservationStatus reservationStatus;
+    private ReservationStatus reservationStatus; // 예약상태
 
     @CreatedDate
     @Column(name = "created_at")
