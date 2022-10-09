@@ -11,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
+@Table(name = "cart")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,7 +20,6 @@ public class Cart { // 관심상품
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cart_id")
     private Long id;
 
     @Column(name = "select_required_option_name")

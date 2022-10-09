@@ -13,6 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
+@Table(name = "reservation_package")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +21,6 @@ import java.sql.Timestamp;
 public class ReservationPackage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reservation_package_id")
     private Long id;
 
     @Column(name = "select_required_option_name")
@@ -61,6 +61,6 @@ public class ReservationPackage {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_number")
+    @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 }

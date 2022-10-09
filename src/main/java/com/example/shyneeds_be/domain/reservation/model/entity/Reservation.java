@@ -14,6 +14,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 
+@Table(name = "reservation")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,7 +23,6 @@ public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reservation_id")
     private Long id;
 
     @Column(name = "payment_method")

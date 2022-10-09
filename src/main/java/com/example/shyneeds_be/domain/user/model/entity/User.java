@@ -20,14 +20,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+@Table(name = "user")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
     private Long id;
 
     @Column(name = "email")
