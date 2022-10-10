@@ -47,8 +47,8 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .authorizeRequests()
                 .antMatchers("/login","/login/kakao/","/","/signup").permitAll()
-                .antMatchers("/admin/**").hasAnyAuthority("ADMIN")
-                .antMatchers("/user/**").authenticated()
+                .antMatchers("/api/package/admin/**").hasAnyAuthority("ADMIN")
+                .antMatchers("/api/reservation/user/**").authenticated()
                 .and()
 
                 .addFilterBefore(new JwtAuthenticationFilter(authTokenProvider), UsernamePasswordAuthenticationFilter.class)
