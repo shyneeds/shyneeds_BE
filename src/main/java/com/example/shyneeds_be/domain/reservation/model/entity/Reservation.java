@@ -5,6 +5,7 @@ import com.example.shyneeds_be.domain.reservation_package.model.entity.Reservati
 import com.example.shyneeds_be.domain.user.model.entity.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,6 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 @EntityListeners(AuditingEntityListener.class)
 public class Reservation {
 
@@ -37,13 +39,13 @@ public class Reservation {
     private Long totalReservationAmount;  // 총 예약 금액
 
     @Column(name = "reservation_number")
-    private Long reservationNumber;  // 예약번호
+    private String reservationNumber;  // 예약번호
 
-//    @Column(name = "입금자명")
-//    private String = 입금자명;  // 입금자명
-//
-//    @Column(name = "약관 동의여부")
-//    private Boolean = 약관동의여부;  // 약관동의 여부
+    @Column(name = "depositor_name")
+    private String depositorName;  // 입금자명
+
+    @Column(name = "service_terms")
+    private Boolean serviceTerms;  // 약관동의 여부
 
     @Column(name = "reservation_status")
     @Enumerated(EnumType.STRING)

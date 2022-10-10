@@ -3,6 +3,7 @@ package com.example.shyneeds_be.domain.travel_package.repository;
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.TravelPackage;
 import com.example.shyneeds_be.global.model.dto.response.MainTravelPackage;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -39,4 +40,8 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
             "WHERE TP.category_ids IN (CA.id)"
             ,nativeQuery = true)
     List<MainTravelPackage> findByCategory(@Param(value = "searchTitle") String category);
+
+    @Query(value="SELECT * FROM shyneeds.travel_package " +
+            "WHERE id = :id ", nativeQuery = true)
+    TravelPackage findByPackageId(@Param("id") Long id);
 }

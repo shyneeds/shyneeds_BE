@@ -5,6 +5,7 @@ import com.example.shyneeds_be.domain.reservation_package.model.enums.PackageRes
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.TravelPackage;
 import com.example.shyneeds_be.domain.user.model.entity.User;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -19,6 +20,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 @EntityListeners(AuditingEntityListener.class)
 public class ReservationPackage {
     @Id
@@ -42,9 +44,6 @@ public class ReservationPackage {
 
     @Column(name = "quantity")
     private Integer quantity;
-
-    @Column(name = "package_reservation_status")
-    private PackageReservationStatus packageReservationStatus;
 
     @CreatedDate
     @Column(name = "created_at")
