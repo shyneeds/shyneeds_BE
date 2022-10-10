@@ -53,9 +53,10 @@ public class OauthService {
 
         user.saveRefreshToken(token.getToken().getRefreshToken());
 
-        AuthResponseDto authResponseDto = new AuthResponseDto(token.getToken().getAccessToken());
-
-        return authResponseDto;
+        return AuthResponseDto.builder()
+                .accessToken(token.getToken().getAccessToken())
+                .userId(user.getId())
+                .build();
     }
 
     @Transactional
@@ -104,16 +105,22 @@ public class OauthService {
             kakaoUser.saveRefreshToken(token.getToken().getRefreshToken());
             userRepository.save(kakaoUser);
 
+            return AuthResponseDto.builder()
+                    .accessToken(token.getToken().getAccessToken())
+                    .userId(kakaoUser.getId())
+                    .build();
+
         } else {
             token = authTokenProvider.createToken(kakaoUser.getEmail(), userRepository.findByKakaoId(kakaoId).getRole());
             User user = userRepository.findByKakaoId(kakaoId);
             user.saveRefreshToken(token.getToken().getRefreshToken());
             userRepository.save(user);
-        }
 
-        return AuthResponseDto.builder()
-                .accessToken(token.getToken().getAccessToken())
-                .build();
+            return AuthResponseDto.builder()
+                    .accessToken(token.getToken().getAccessToken())
+                    .userId(user.getId())
+                    .build();
+        }
     }
 
 }

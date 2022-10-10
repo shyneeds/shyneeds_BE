@@ -15,8 +15,8 @@ public class AuthController {
     private final OauthService oauthService;
     @PostMapping("/login")
     public ApiResponseDto<AuthResponseDto> login(@RequestBody LoginRequestDto loginRequestDto){
-        AuthResponseDto accessToken = oauthService.login(loginRequestDto);
-        return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(),"로그인 성공", accessToken);
+        AuthResponseDto authResponse = oauthService.login(loginRequestDto);
+        return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(),"로그인 성공", authResponse);
     }
 
     @PostMapping("/signup")
@@ -26,8 +26,8 @@ public class AuthController {
     }
     @PostMapping("/login/kakao")
     public ApiResponseDto<AuthResponseDto> kakaoLogin(@RequestHeader("Authorization") AuthRequestDto authAccessToken){
-        AuthResponseDto accessToken = oauthService.kakaoLogin(authAccessToken);
-        return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "로그인 성공", accessToken);
+        AuthResponseDto authResponse = oauthService.kakaoLogin(authAccessToken);
+        return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "로그인 성공", authResponse);
     }
 
 

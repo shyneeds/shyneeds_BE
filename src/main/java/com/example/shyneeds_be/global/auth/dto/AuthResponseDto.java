@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AuthResponseDto {
     private String accessToken;
+    private Long userId;
 }
