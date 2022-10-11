@@ -30,7 +30,7 @@ public class MainTravelPackageResponseDto {
     private String summary;
 
     @ApiModelProperty(value = "태그", required = false, example = "")
-    private String tag; // 카테고리 타이틀 => 서브카테고리 타이틀로 변경 필요
+    private String tag; // 카테고리 타이틀 => 서브카테고리 타이틀 URL로 변경 필요
 
 //    @ApiModelProperty(value = "태그-그룹별", required = false, example = "")
 //    @ApiModelProperty(value = "태그-지역별", required = false, example = "")
