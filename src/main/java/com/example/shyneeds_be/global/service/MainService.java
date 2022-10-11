@@ -109,7 +109,7 @@ public class MainService {
 
             List<MainTravelPackageResponseDto> curationResultPackageList = new ArrayList<>();
             String age = curationRequestDto.getAge();
-            String accompany = curationRequestDto.getAge();
+            String accompany = curationRequestDto.getAccompany();
             String tendency = curationRequestDto.getTendency();
             String religion = curationRequestDto.getReligion();
             String country = curationRequestDto.getCountry();
