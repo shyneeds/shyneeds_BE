@@ -1,6 +1,6 @@
 package com.example.shyneeds_be.domain.reservation.controller;
 
-import com.example.shyneeds_be.domain.reservation.model.dto.AddReservationRequestDto;
+import com.example.shyneeds_be.domain.reservation.model.dto.request.AddReservationRequestDto;
 import com.example.shyneeds_be.domain.reservation.service.ReservationService;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;

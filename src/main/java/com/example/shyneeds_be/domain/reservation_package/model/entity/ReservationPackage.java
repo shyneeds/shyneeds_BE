@@ -1,7 +1,6 @@
 package com.example.shyneeds_be.domain.reservation_package.model.entity;
 
 import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
-import com.example.shyneeds_be.domain.reservation_package.model.enums.PackageReservationStatus;
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.TravelPackage;
 import com.example.shyneeds_be.domain.user.model.entity.User;
 import lombok.AllArgsConstructor;

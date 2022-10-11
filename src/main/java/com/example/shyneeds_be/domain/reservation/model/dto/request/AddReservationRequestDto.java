@@ -1,4 +1,4 @@
-package com.example.shyneeds_be.domain.reservation.model.dto;
+package com.example.shyneeds_be.domain.reservation.model.dto.request;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

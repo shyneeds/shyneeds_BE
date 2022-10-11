@@ -1,7 +1,7 @@
 package com.example.shyneeds_be.domain.reservation.service;
 
-import com.example.shyneeds_be.domain.reservation.model.dto.AddReservationRequestDto;
-import com.example.shyneeds_be.domain.reservation.model.dto.ReservationPackageRequestDto;
+import com.example.shyneeds_be.domain.reservation.model.dto.request.AddReservationRequestDto;
+import com.example.shyneeds_be.domain.reservation.model.dto.request.ReservationPackageRequestDto;
 import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
 import com.example.shyneeds_be.domain.reservation.model.enums.ReservationStatus;
 import com.example.shyneeds_be.domain.reservation.repository.ReservationRepository;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Random;
 
 @Service
@@ -29,6 +28,7 @@ public class ReservationService {
     private final ReservationPackageRepository reservationPackageRepository;
     private final TravelPackageRepository travelPackageRepository;
 
+//  예약하기
     public ApiResponseDto addReservation(Long userId, AddReservationRequestDto addReservationRequest){
         try {
             User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("없는 사용자입니다."));
@@ -64,6 +64,7 @@ public class ReservationService {
         }
     }
 
+//  예약번호 생성 (날짜 + 네자리 난수)
     public String createReservationNumber(){
         String pattern = "yyyyMMdd";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
