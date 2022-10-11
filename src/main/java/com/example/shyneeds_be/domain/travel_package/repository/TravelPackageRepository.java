@@ -77,4 +77,8 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
             @Param(value = "tendencyGroup") String tendencyGroup, @Param(value = "religionGroup") String religionGroup,
             @Param(value = "countryGroup") String countryGroup, @Param(value = "themeGroup") String themeGroup
             );
+
+    @Query(value="SELECT * FROM shyneeds.travel_package " +
+            "WHERE id = :id ", nativeQuery = true)
+    TravelPackage findByPackageId(@Param("id") Long id);
 }
