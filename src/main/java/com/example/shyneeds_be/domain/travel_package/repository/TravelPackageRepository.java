@@ -39,6 +39,7 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
             "ON CA.title REGEXP :searchTitle " +
             "INNER JOIN shyneeds.sub_category AS SCA ON SCA.category_id = CA.id " +
             "WHERE TP.sub_category_ids REGEXP (SCA.id) " +
+            "AND TP.disp_flg = 1 AND TP.deleted_flg = 0 " +
             "GROUP BY TP.id " +
             "ORDER BY TP.updated_at DESC"
             ,nativeQuery = true)
@@ -47,15 +48,16 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
 
     // 큐레이션 검색
     @Query(value = "SELECT " +
-            "SCA.title AS categoryTitle, " + // sub category id -> badge
+            "SCA.title AS categoryTitle, " + // 인터페이스 양식에 맞추기 위한 의미없는 값
+            "SCA.title AS subCategoryTitle, " + // sub category title url -> tag
             "TP.id AS id, " +
             "TP.title AS title, " +
             "TP.main_image AS mainImage, " +
             "TP.summary AS summary, " +
             "TP.price AS price, " +
             "TP.search_keyword AS keyword " +
-            "FROM shyneeds.sub_category AS SCA " +
-            "INNER JOIN shyneeds.travel_package AS TP ON TP.sub_category_ids REGEXP SCA.id " +
+            "FROM shyneeds.travel_package AS TP " +
+            "INNER JOIN shyneeds.sub_category AS SCA ON TP.sub_category_ids REGEXP SCA.id " +
             "INNER JOIN shyneeds.sub_category AS SCA2 ON TP.sub_category_ids REGEXP SCA2.id " +
             "INNER JOIN shyneeds.sub_category AS SCA3 ON TP.sub_category_ids REGEXP SCA3.id " +
             "INNER JOIN shyneeds.sub_category AS SCA4 ON TP.sub_category_ids REGEXP SCA4.id " +
@@ -70,7 +72,7 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
             "AND IF(:themeGroup IS NOT NULL, SCA5.title REGEXP :themeGroup, true) " +
             "AND TP.disp_flg = 1 AND TP.deleted_flg = 0 " +
             "GROUP BY TP.id " +
-            "ORDER BY TP.updated_at DESC"
+            "ORDER BY TP.updated_at DESC "
             ,nativeQuery = true)
     List<MainTravelPackage> findByCuration(
             @Param(value = "ageGroup") String ageGroup, @Param(value = "accompanyGroup") String accompanyGroup,
