@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +28,6 @@ public class UserService {
             Date birthday = dateFormat.parse(strBirthday);
 
             user.builder()
-                    .email(updateUserRequest.getEmail())
                     .password(passwordEncoder.encode(user.getPassword()))
                     .name(updateUserRequest.getName())
                     .birthday(birthday)
@@ -42,8 +41,16 @@ public class UserService {
         }
     }
 
+    public ApiResponseDto deleteUser(Long id) {
+        try {
+            userRepository.delete(findUserById(id));
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "회원탈퇴를 성공했습니다.");
 
+        } catch (Exception e) {
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "회원탈퇴에 실패했습니다.");
+        }
 
+    }
     public User findUserById(Long id){
         return userRepository.findById(id).orElseThrow( () -> new IllegalArgumentException("없는 유저입니다.") );
     }
