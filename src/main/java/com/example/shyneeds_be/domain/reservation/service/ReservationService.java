@@ -34,7 +34,9 @@ public class ReservationService {
             User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("없는 사용자입니다."));
             Reservation reservation = Reservation.builder()
                     .paymentMethod(addReservationRequest.getPaymentMethod())
+                    .paymentAccountBank(addReservationRequest.getPaymentAccountBank())
                     .paymentAccountNumber(addReservationRequest.getPaymentAccountNumber())
+                    .paymentAccountHolder(addReservationRequest.getPaymentAccountHolder())
                     .depositorName(addReservationRequest.getDepositorName())
                     .serviceTerms(addReservationRequest.getServiceTerms())
                     .totalReservationAmount(addReservationRequest.getTotalReservationAmount())

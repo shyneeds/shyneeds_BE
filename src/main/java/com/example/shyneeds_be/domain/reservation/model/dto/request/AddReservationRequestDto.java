@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import java.util.List;
 
 @AllArgsConstructor
@@ -21,8 +22,14 @@ public class AddReservationRequestDto {
     @ApiModelProperty(value = "예약금 지불 수단", required = true, example = "무통장 입금")
     private String paymentMethod;
 
-    @ApiModelProperty(value = "계좌번호", required = true, example = "신한은행 100-3333-4444(더샤이니)")
+    @ApiModelProperty(value = "입금 은행", required = true, example = "신한은행")
+    private String paymentAccountBank;
+
+    @ApiModelProperty(value = "계좌번호", required = true, example = "100-3333-4444")
     private String paymentAccountNumber;
+
+    @ApiModelProperty(value = "예금주", required = true, example = "더 샤이니")
+    private String paymentAccountHolder; // 예금주
 
     @ApiModelProperty(value = "입금자명", required = true, example = "입금자")
     private String depositorName;

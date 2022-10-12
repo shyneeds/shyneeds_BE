@@ -32,8 +32,14 @@ public class Reservation {
     @Column(name = "payment_method")
     private String paymentMethod;  // 결제수단
 
+    @Column(name = "payment_account_bank")
+    private String paymentAccountBank;  // 결제 은행
+
     @Column(name = "payment_account_number")
     private String paymentAccountNumber;  // 계좌번호
+
+    @Column(name = "payment_account_holder")
+    private String paymentAccountHolder; // 예금주
 
     @Column(name = "total_reservation_amount")
     private Long totalReservationAmount;  // 총 예약 금액
@@ -66,7 +72,6 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
 
 
 }
