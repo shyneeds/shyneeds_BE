@@ -42,7 +42,7 @@ public class UserService {
 
             String profileImageUrl = uploadS3UserProfileImage(profileImage, id.toString());
 
-            if(updateUserRequest.getProfileImage() != null) {
+            if(profileImage != null) {
                 if (updateUserRequest.getPassword() != null) {
                     String password = passwordEncoder.encode(updateUserRequest.getPassword());
                     user.updateInfoWithImage(profileImageUrl, password, updateUserRequest.getName(), birthday, updateUserRequest.getGender());
@@ -80,7 +80,7 @@ public class UserService {
     }
 
     public String uploadS3UserProfileImage(MultipartFile profileImage, String bucketDir){
-        return itemS3Uploader.uploadLocal(profileImage, bucketDir);
+        return itemS3Uploader.uploadLocal(profileImage, bucket+"/user/"+bucketDir);
     }
 
 
