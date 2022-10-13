@@ -56,7 +56,6 @@ public class ReservationService {
                         .reservation_price(reservationPackageRequest.getReservation_price())
                         .travelPackage(travelPackageRepository.findByPackageId(reservationPackageRequest.getTravelPackageId()))
                         .reservation(reservation)
-                        .user(user)
                         .build();
                 reservationPackageRepository.save(reservationPackage);
             }

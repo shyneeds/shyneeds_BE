@@ -2,7 +2,6 @@ package com.example.shyneeds_be.domain.reservation_package.model.entity;
 
 import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.TravelPackage;
-import com.example.shyneeds_be.domain.user.model.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,10 +54,6 @@ public class ReservationPackage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travel_package_id")
     private TravelPackage travelPackage;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id")
