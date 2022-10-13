@@ -6,6 +6,7 @@ import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,8 +17,9 @@ public class UserController {
 
     @ApiOperation(value = "유저 정보 수정 기능")
     @PatchMapping("/{id}")
-    public ApiResponseDto updateUserInfo(@PathVariable("id") Long userId, @RequestBody UpdateUserRequestDto updateUserRequest){
-        return userService.updateUser(userId, updateUserRequest);
+    public ApiResponseDto updateUserInfo(@PathVariable("id") Long userId, @RequestBody UpdateUserRequestDto updateUserRequest,
+                                         @RequestPart("profile") MultipartFile profileImage){
+        return userService.updateUser(userId, updateUserRequest, profileImage);
     }
 
     @ApiOperation(value = "회원 탈퇴 기능")

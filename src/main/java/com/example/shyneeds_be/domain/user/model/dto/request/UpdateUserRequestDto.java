@@ -12,14 +12,15 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpdateUserRequestDto {
 
+
+    @ApiModelProperty(value = "프로필 사진", required = true, example = "프로필사진")
+    private String profileImage;
+
     @ApiModelProperty(value = "예약할 패키지 리스트", required = true)
     private String password;
 
     @ApiModelProperty(value = "이름", required = true)
     private String name;
-
-//    @ApiModelProperty(value = "핸드폰 번호", required = true, example = "0100000")
-//    private String phoneNumber;
 
     @ApiModelProperty(value = "출생년도", required = true, example = "1950")
     private String year;
