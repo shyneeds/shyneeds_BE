@@ -19,7 +19,9 @@ public class MyPageReservationResponseDto {
 
     private Timestamp reservatedAt;
 
+    private ReservationStatus reservationStatus;
+
     private List<MyPageReservationPackageResponseDto> reservationPackage;
 
-    private ReservationStatus reservationStatus;
+
 }
