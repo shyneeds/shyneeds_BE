@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -69,22 +70,20 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Cart> carts;
 
-    @JsonBackReference
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<ReservationPackage> reservationPackages = new ArrayList<>();
+    public void saveRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
+    }
 
-    @Builder
-    public User(String email, String password, String name, Date birthday, String gender, String role, Long kakaoId){
-        this.email = email;
+    public void updateInfo(String password, String name, Date birthday, String gender) {
         this.password = password;
         this.name = name;
         this.birthday = birthday;
         this.gender = gender;
-        this.role = role;
-        this.kakaoId = kakaoId;
     }
 
-    public void saveRefreshToken(String refreshToken){
-        this.refreshToken = refreshToken;
+    public void updateInfo(String name, Date birthday, String gender){
+        this.name = name;
+        this.birthday = birthday;
+        this.gender = gender;
     }
 }

@@ -8,6 +8,7 @@ import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,21 +20,20 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public ApiResponseDto updateUser(Long id, UpdateUserRequestDto updateUserRequest) {
         try{
             User user = findUserById(id);
 
-            String strBirthday = updateUserRequest.getYear()+"-"+updateUserRequest.getMonth()+"-"+updateUserRequest.getDay();
+            String strBirthday = updateUserRequest.getYear() + "-" + updateUserRequest.getMonth() + "-" + updateUserRequest.getDay();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Date birthday = dateFormat.parse(strBirthday);
 
-            user.builder()
-                    .password(passwordEncoder.encode(user.getPassword()))
-                    .name(updateUserRequest.getName())
-                    .birthday(birthday)
-                    .gender(updateUserRequest.getGender())
-                    .build();
-            userRepository.save(user);
+            if(updateUserRequest.getPassword() != null){
+                String password = passwordEncoder.encode(updateUserRequest.getPassword());
+                user.updateInfo(password, updateUserRequest.getName(), birthday, updateUserRequest.getGender());
+            }
+            user.updateInfo(updateUserRequest.getName(), birthday, updateUserRequest.getGender());
 
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "사용자 정보 수정에 성공했습니다.");
         } catch (Exception e){
