@@ -38,7 +38,7 @@ public class ReservationPackage {
     private String selectOptionalValues;
 
     @Column(name = "reservation_price")
-    private Long reservation_price;
+    private String reservation_price;
 
     @Column(name = "quantity")
     private Integer quantity;

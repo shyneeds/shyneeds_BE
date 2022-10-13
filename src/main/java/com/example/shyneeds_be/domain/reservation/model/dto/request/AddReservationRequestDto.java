@@ -17,7 +17,7 @@ public class AddReservationRequestDto {
     private List<ReservationPackageRequestDto> reservationPackages;
 
     @ApiModelProperty(value = "총 예약 금액", required = true, example = "3,000,000")
-    private Long totalReservationAmount;
+    private String totalReservationAmount;
 
     @ApiModelProperty(value = "예약금 지불 수단", required = true, example = "무통장 입금")
     private String paymentMethod;

@@ -24,7 +24,7 @@ public class ReservationPackageRequestDto {
     private String selectOptionalValues;
 
     @ApiModelProperty(value = "예약 가격", required = true, example = "3,000,000")
-    private Long reservation_price;
+    private String reservation_price;
 
     @ApiModelProperty(value = "수량", required = true, example = "1")
     private Integer quantity;

@@ -42,7 +42,7 @@ public class Reservation {
     private String paymentAccountHolder; // 예금주
 
     @Column(name = "total_reservation_amount")
-    private Long totalReservationAmount;  // 총 예약 금액
+    private String totalReservationAmount;  // 총 예약 금액
 
     @Column(name = "reservation_number")
     private String reservationNumber;  // 예약번호
