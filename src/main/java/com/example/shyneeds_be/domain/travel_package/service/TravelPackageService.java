@@ -1,9 +1,7 @@
 package com.example.shyneeds_be.domain.travel_package.service;
 
 import com.example.shyneeds_be.domain.category.model.entity.Category;
-import com.example.shyneeds_be.domain.category.model.entity.SubCategory;
 import com.example.shyneeds_be.domain.category.model.response.CategoryResponseDto;
-import com.example.shyneeds_be.domain.category.model.response.SubCategoryResponseDto;
 import com.example.shyneeds_be.domain.category.repository.CategoryRepository;
 import com.example.shyneeds_be.domain.travel_package.model.dto.request.TravelPackageRegisterRequestDto;
 import com.example.shyneeds_be.domain.travel_package.model.dto.response.TravelPackageResponseDto;
@@ -238,7 +236,4 @@ public class TravelPackageService {
                 .build();
 
     }
-
-
-
 }

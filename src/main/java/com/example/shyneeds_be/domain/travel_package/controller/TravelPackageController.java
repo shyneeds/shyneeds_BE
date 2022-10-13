@@ -20,9 +20,6 @@ public class TravelPackageController {
     private final TravelPackageService travelPackageService;
 
 
-
-
-
     /* ---------------------------- ADMIN ---------------------------- */
     @ApiOperation(value = "[어드민] 상품 등록")
     @PostMapping(value = "/admin/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
