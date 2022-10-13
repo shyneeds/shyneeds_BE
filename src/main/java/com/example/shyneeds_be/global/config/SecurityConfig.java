@@ -48,6 +48,7 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/login","/login/kakao/","/","/signup").permitAll()
                 .antMatchers("/api/package/admin/**").hasAnyAuthority("ADMIN")
+                .antMatchers("/api/my/user/**").authenticated()
                 .antMatchers("/api/reservation/user/**").authenticated()
                 .and()
 
