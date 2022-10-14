@@ -50,7 +50,7 @@ public class TravelPackageController {
 
 
     @ApiOperation(value = "[어드민] 상품 삭제")
-    @GetMapping("/admin/delete/{id}")
+    @PostMapping("/admin/delete/{id}")
     public ApiResponseDto deletePackage(@PathVariable("id") Long id){
         return travelPackageService.deletedPackage(id);
     }
