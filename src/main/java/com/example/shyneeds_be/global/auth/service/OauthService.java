@@ -55,6 +55,7 @@ public class OauthService {
 
         return AuthResponseDto.builder()
                 .accessToken(token.getToken().getAccessToken())
+                .refreshToken(token.getToken().getRefreshToken())
                 .userId(user.getId())
                 .build();
     }
@@ -107,6 +108,7 @@ public class OauthService {
 
             return AuthResponseDto.builder()
                     .accessToken(token.getToken().getAccessToken())
+                    .refreshToken(token.getToken().getRefreshToken())
                     .userId(kakaoUser.getId())
                     .build();
 
@@ -118,6 +120,7 @@ public class OauthService {
 
             return AuthResponseDto.builder()
                     .accessToken(token.getToken().getAccessToken())
+                    .refreshToken(token.getToken().getRefreshToken())
                     .userId(user.getId())
                     .build();
         }
