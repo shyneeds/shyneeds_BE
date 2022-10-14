@@ -21,6 +21,8 @@ public class MyPageReservationResponseDto {
 
     private ReservationStatus reservationStatus;
 
+    private String totalReservationAmount;
+
     private List<MyPageReservationPackageResponseDto> reservationPackage;
 
 

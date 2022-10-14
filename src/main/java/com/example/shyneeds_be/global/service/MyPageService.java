@@ -75,6 +75,7 @@ public class MyPageService {
                                 .reservationNumber(reservation.getReservationNumber())
                                 .reservatedAt(reservation.getCreatedAt())
                                 .reservationStatus(reservation.getReservationStatus())
+                                .totalReservationAmount(reservation.getTotalReservationAmount())
                                 .reservationPackage(myPageReservationPackageResponse(reservation.getId()))
                                 .build()
             );
@@ -94,16 +95,23 @@ public class MyPageService {
         List<MyPageReservationPackageResponseDto> myPageReservationPackageResponseList = new ArrayList<>();
 
         for(ReservationPackage reservationPackage : reservationPackageList){
+
+            String imageDir = "https://shyneeds.s3.ap-northeast-2.amazonaws.com/package/"+
+                    reservationPackage.getTravelPackage().getTitle()+"/main/"+reservationPackage.getTravelPackage().getMainImage();
+
             myPageReservationPackageResponseList.add(
                     MyPageReservationPackageResponseDto.builder()
                             .packageId(reservationPackage.getId())
+                            .imageUrl(imageDir)
                             .title(reservationPackage.getTravelPackage().getTitle())
                             .optionName(reservationPackage.getSelectOptionalName()) // 일단 선택옵션 이름
                             .optionValue(reservationPackage.getSelectOptionalValues()) // 일단 선택옵션 내용
+                            .price(reservationPackage.getReservation_price())
                             .build()
             );
         }
 
         return myPageReservationPackageResponseList;
     }
+
 }
