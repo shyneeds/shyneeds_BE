@@ -1,5 +1,6 @@
 package com.example.shyneeds_be;
 
+import com.example.shyneeds_be.domain.travel_package.model.dto.request.PackageOptionRequestDto;
 import com.example.shyneeds_be.domain.travel_package.model.dto.request.TravelPackageRegisterRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -29,6 +30,19 @@ public class ShyneedsBeApplication {
         @SneakyThrows
         public TravelPackageRegisterRequestDto convert(String source) {
             return objectMapper.readValue(source, TravelPackageRegisterRequestDto.class);
+        }
+    }
+
+    @Component
+    public static class StringToPackageOption implements Converter<String, PackageOptionRequestDto> {
+
+        @Autowired
+        private ObjectMapper objectMapper;
+
+        @Override
+        @SneakyThrows
+        public PackageOptionRequestDto convert(String source) {
+            return objectMapper.readValue(source, PackageOptionRequestDto.class);
         }
     }
 }

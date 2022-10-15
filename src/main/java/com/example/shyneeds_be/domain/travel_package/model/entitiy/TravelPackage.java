@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -21,6 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class TravelPackage {
 
     @Id
@@ -51,20 +53,8 @@ public class TravelPackage {
     @Column(name = "summary")
     private String summary;
 
-    @Column(name = "required_option_name")
-    private String requiredOptionName;
-
-    @Column(name = "required_option_values")
-    private String requiredOptionValues;
-
-    @Column(name = "optional_name")
-    private String optionalName;
-
-    @Column(name = "optional_values")
-    private String optionalValues;
-
-    @Column(name = "flight_info")
-    private String flightInfo;
+    @OneToMany(mappedBy = "travelPackage", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<PackageOption> packageOptionList;
 
     @Column(name = "soldout_flg")
     private boolean soldoutFlg;
