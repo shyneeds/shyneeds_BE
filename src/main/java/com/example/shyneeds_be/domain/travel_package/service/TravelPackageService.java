@@ -232,13 +232,15 @@ public class TravelPackageService {
 
     private Map<String, List<PackageOptionResponseDto>> responsePackageOptionMap(List<PackageOption> packageOptionList){
         Map<String, List<PackageOptionResponseDto>> packageOptionMap = new HashMap<>();
+
         List<PackageOptionResponseDto> packageOptionResponseDtoList = new ArrayList<>();
 
         // packageOption 순회
         for (PackageOption packageOption : packageOptionList) {
-            // map의 키에 packagOption 타이틀 (키값)이 없으면 키값으로 사용
+            // map의 키에 packageOption 타이틀 (키값)이 없으면 키값으로 사용
             if(!packageOptionMap.containsKey(packageOption.getTitle())) {
-                packageOptionResponseDtoList.clear(); // 저장된 옵션 리스트 초기화
+                // 키 값 변경 시 새로운 리스트로 초기화
+                packageOptionResponseDtoList = new ArrayList<>();
             }
 
             PackageOptionResponseDto packageOptionResponseDto = PackageOptionResponseDto.builder()
@@ -251,12 +253,10 @@ public class TravelPackageService {
                         .updatedAt(packageOption.getUpdatedAt())
                         .build();
 
-            packageOptionResponseDtoList.add(packageOptionResponseDto);;
+                packageOptionResponseDtoList.add(packageOptionResponseDto);;
 
-
-            if(!packageOptionMap.containsKey(packageOption.getTitle())) {
                 packageOptionMap.put(packageOption.getTitle(), packageOptionResponseDtoList);
-            }
+
 
         }
 
