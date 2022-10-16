@@ -1,6 +1,7 @@
 package com.example.shyneeds_be.domain.travel_package.controller;
 
 import com.example.shyneeds_be.domain.travel_package.model.dto.request.TravelPackageRegisterRequestDto;
+import com.example.shyneeds_be.domain.travel_package.model.dto.response.DetailPackageResponseDto;
 import com.example.shyneeds_be.domain.travel_package.model.dto.response.TravelPackageResponseDto;
 import com.example.shyneeds_be.domain.travel_package.service.TravelPackageService;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
@@ -20,7 +21,12 @@ public class TravelPackageController {
 
     private final TravelPackageService travelPackageService;
 
-
+    /* ---------------------------- Service  ---------------------------- */
+    @ApiOperation(value = "상품 상세 보기")
+    @GetMapping("/{id}")
+    public ApiResponseDto<DetailPackageResponseDto> getPackageDetail(@PathVariable("id") Long id){
+        return travelPackageService.getPackageDetail(id);
+    }
 
 
 

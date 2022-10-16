@@ -7,6 +7,7 @@ import com.example.shyneeds_be.domain.category.model.response.SubCategoryRespons
 import com.example.shyneeds_be.domain.category.repository.CategoryRepository;
 import com.example.shyneeds_be.domain.travel_package.model.dto.request.PackageOptionRequestDto;
 import com.example.shyneeds_be.domain.travel_package.model.dto.request.TravelPackageRegisterRequestDto;
+import com.example.shyneeds_be.domain.travel_package.model.dto.response.DetailPackageResponseDto;
 import com.example.shyneeds_be.domain.travel_package.model.dto.response.PackageOptionResponseDto;
 import com.example.shyneeds_be.domain.travel_package.model.dto.response.TravelPackageResponseDto;
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.PackageOption;
@@ -41,6 +42,27 @@ public class TravelPackageService {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+
+    public ApiResponseDto<DetailPackageResponseDto> getPackageDetail(Long id){
+        try{
+
+            // 상품 정보
+            TravelPackage travelPackage = travelPackageRepository.findById(id).orElseThrow(() -> new NoSuchElementException("조회되는 상품이 없습니다."));
+            TravelPackageResponseDto travelPackageResponseDto = response(travelPackage);
+
+            // 연관 상품 리스트
+            List<TravelPackageResponseDto> relatedPackageList = travelPackageRepository.findRelatedPackageList(id).stream().map(this::response).toList();
+            DetailPackageResponseDto detailPackageResponseDto = DetailPackageResponseDto.builder()
+                    .travelPackageResponseDto(travelPackageResponseDto)
+                    .relatedPackageList(relatedPackageList)
+                    .build();
+
+
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", detailPackageResponseDto);
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다." + e.getMessage());
+        }
+    }
 
     /*
     ADMIN 기능 : 상품 등록
