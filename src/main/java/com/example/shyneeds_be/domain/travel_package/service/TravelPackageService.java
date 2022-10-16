@@ -131,10 +131,15 @@ public class TravelPackageService {
     }
 
     /*--------------------------------[어드민] 상품 리스트 조회------------------------------------ */
-    public ApiResponseDto<List<TravelPackageResponseDto>> getAdminPackageList() {
+    public ApiResponseDto<List<TravelPackageResponseDto>> getAdminPackageList(String title) {
        try{
 
-           List<TravelPackageResponseDto> travelPackageResponseDtoList = travelPackageRepository.findAll().stream().map(this::response).toList();
+           List<TravelPackageResponseDto> travelPackageResponseDtoList = new ArrayList<>();
+           if(title.equals("all")) {
+               travelPackageResponseDtoList = travelPackageRepository.findAll().stream().map(this::response).toList();
+           } else {
+               travelPackageResponseDtoList = travelPackageRepository.findSearchPackageList(title).stream().map(this::response).toList();
+           }
 
            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", travelPackageResponseDtoList);
        } catch (Exception e){

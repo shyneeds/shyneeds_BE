@@ -83,4 +83,13 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
     @Query(value="SELECT * FROM shyneeds.travel_package " +
             "WHERE id = :id ", nativeQuery = true)
     TravelPackage findByPackageId(@Param("id") Long id);
+
+
+    // [어드민] 상품 리스트 검색
+    @Query(value = "SELECT * FROM shyneeds.travel_package " +
+            "WHERE title  REGEXP :searchTitle " +
+            "AND deleted_flg = 0 " +
+            "ORDER BY updated_at DESC",
+            nativeQuery = true)
+    List<TravelPackage> findSearchPackageList(@Param("searchTitle") String searchTitle);
 }

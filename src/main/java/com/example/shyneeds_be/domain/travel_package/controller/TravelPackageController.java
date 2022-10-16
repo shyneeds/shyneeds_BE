@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -37,9 +38,9 @@ public class TravelPackageController {
 
 
     @ApiOperation(value = "[어드민] 상품 리스트 조회")
-    @GetMapping("/admin")
-    public ApiResponseDto<List<TravelPackageResponseDto>> getPackageList(){
-        return travelPackageService.getAdminPackageList();
+    @GetMapping("/admin/list")
+    public ApiResponseDto<List<TravelPackageResponseDto>> getPackageList(@PathParam("title") String title){
+        return travelPackageService.getAdminPackageList(title);
     }
 
     @ApiOperation(value = "[어드민] 상품 조회")
