@@ -56,11 +56,13 @@ public class CategoryService {
         // 서브 카테고리
         List<SubCategoryResponseDto> subCategoryResponseDtoList = new ArrayList<>();
 
-        StringTokenizer st = new StringTokenizer(category.getSubCategoryIds(), ",");
-        while(st.hasMoreElements()){
-            Optional<SubCategory> optionalSubCategory = subCategoryRepository.findById(Long.valueOf(st.nextToken()));
-            if(optionalSubCategory.isPresent()){
-                subCategoryResponseDtoList.add(responseSubCategory(optionalSubCategory.get()));
+        if(category.getSubCategoryIds() != null) {
+            StringTokenizer st = new StringTokenizer(category.getSubCategoryIds(), ",");
+            while (st.hasMoreElements()) {
+                Optional<SubCategory> optionalSubCategory = subCategoryRepository.findById(Long.valueOf(st.nextToken()));
+                if (optionalSubCategory.isPresent()) {
+                    subCategoryResponseDtoList.add(responseSubCategory(optionalSubCategory.get()));
+                }
             }
         }
        return CategoryResponseDto.builder()
