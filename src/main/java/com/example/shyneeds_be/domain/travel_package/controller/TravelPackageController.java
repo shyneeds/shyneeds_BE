@@ -1,6 +1,7 @@
 package com.example.shyneeds_be.domain.travel_package.controller;
 
 import com.example.shyneeds_be.domain.travel_package.model.dto.request.TravelPackageRegisterRequestDto;
+import com.example.shyneeds_be.domain.travel_package.model.dto.response.DetailPackageResponseDto;
 import com.example.shyneeds_be.domain.travel_package.model.dto.response.TravelPackageResponseDto;
 import com.example.shyneeds_be.domain.travel_package.service.TravelPackageService;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
@@ -10,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -18,6 +20,14 @@ import java.util.List;
 public class TravelPackageController {
 
     private final TravelPackageService travelPackageService;
+
+    /* ---------------------------- Service  ---------------------------- */
+    @ApiOperation(value = "상품 상세 보기")
+    @GetMapping("/{id}")
+    public ApiResponseDto<DetailPackageResponseDto> getPackageDetail(@PathVariable("id") Long id){
+        return travelPackageService.getPackageDetail(id);
+    }
+
 
 
     /* ---------------------------- ADMIN ---------------------------- */
@@ -34,9 +44,9 @@ public class TravelPackageController {
 
 
     @ApiOperation(value = "[어드민] 상품 리스트 조회")
-    @GetMapping("/admin")
-    public ApiResponseDto<List<TravelPackageResponseDto>> getPackageList(){
-        return travelPackageService.getAdminPackageList();
+    @GetMapping("/admin/list")
+    public ApiResponseDto<List<TravelPackageResponseDto>> getPackageList(@PathParam("title") String title){
+        return travelPackageService.getAdminPackageList(title);
     }
 
     @ApiOperation(value = "[어드민] 상품 조회")
