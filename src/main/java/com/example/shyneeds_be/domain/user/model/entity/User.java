@@ -44,6 +44,9 @@ public class User {
     @Column(name = "user_name")
     private String name;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     @Column(name = "birthday")
     private Date birthday;
 
@@ -78,30 +81,34 @@ public class User {
         this.refreshToken = refreshToken;
     }
 
-    public void updateInfo(String password, String name, Date birthday, String gender) {
+    public void updateInfo(String password, String name, String phoneNumber, Date birthday, String gender) {
         this.password = password;
         this.name = name;
+        this.phoneNumber = phoneNumber;
         this.birthday = birthday;
         this.gender = gender;
     }
 
-    public void updateInfoNoPass(String name, Date birthday, String gender){
+    public void updateInfoNoPass(String name, String phoneNumber, Date birthday, String gender){
         this.name = name;
+        this.phoneNumber = phoneNumber;
         this.birthday = birthday;
         this.gender = gender;
     }
 
-    public void updateInfoWithImage(String profileImageUrl, String password, String name, Date birthday, String gender) {
+    public void updateInfoWithImage(String profileImageUrl, String password, String name, String phoneNumber, Date birthday, String gender) {
         this.profileImage = profileImageUrl;
         this.password = password;
         this.name = name;
+        this.phoneNumber = phoneNumber;
         this.birthday = birthday;
         this.gender = gender;
     }
 
-    public void updateInfoNoPassWithImage(String profileImageUrl,String name, Date birthday, String gender) {
+    public void updateInfoNoPassWithImage(String profileImageUrl,String name, String phoneNumber, Date birthday, String gender) {
         this.profileImage = profileImageUrl;
         this.name = name;
+        this.phoneNumber = phoneNumber;
         this.birthday = birthday;
         this.gender = gender;
     }

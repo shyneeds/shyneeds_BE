@@ -22,6 +22,8 @@ public class MyPageUserResponseDto {
 
     private String name;
 
+    private String phoneNumber;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date birthday;

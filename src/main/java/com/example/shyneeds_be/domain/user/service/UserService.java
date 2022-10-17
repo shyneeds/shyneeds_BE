@@ -45,15 +45,15 @@ public class UserService {
             if(profileImage != null) {
                 if (updateUserRequest.getPassword() != null) {
                     String password = passwordEncoder.encode(updateUserRequest.getPassword());
-                    user.updateInfoWithImage(profileImageUrl, password, updateUserRequest.getName(), birthday, updateUserRequest.getGender());
+                    user.updateInfoWithImage(profileImageUrl, password, updateUserRequest.getName(),updateUserRequest.getPhoneNumber() ,birthday, updateUserRequest.getGender());
                 }
-                user.updateInfoNoPassWithImage(profileImageUrl, updateUserRequest.getName(), birthday, updateUserRequest.getGender());
+                user.updateInfoNoPassWithImage(profileImageUrl, updateUserRequest.getName(), updateUserRequest.getPhoneNumber(), birthday, updateUserRequest.getGender());
             } else{
                 if (updateUserRequest.getPassword() != null) {
                     String password = passwordEncoder.encode(updateUserRequest.getPassword());
-                    user.updateInfo(password, updateUserRequest.getName(), birthday, updateUserRequest.getGender());
+                    user.updateInfo(password, updateUserRequest.getName(), updateUserRequest.getPhoneNumber(), birthday, updateUserRequest.getGender());
                 }
-                user.updateInfoNoPass(updateUserRequest.getName(), birthday, updateUserRequest.getGender());
+                user.updateInfoNoPass(updateUserRequest.getName(), updateUserRequest.getPhoneNumber(), birthday, updateUserRequest.getGender());
             }
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "사용자 정보 수정에 성공했습니다.");
         } catch (Exception e){

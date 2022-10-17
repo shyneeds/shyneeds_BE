@@ -51,6 +51,7 @@ public class MyPageService {
                                 .profileImage(imageDir+"/"+ user.getProfileImage())
                                 .email(user.getEmail())
                                 .name(user.getName())
+                                .phoneNumber(user.getPhoneNumber())
                                 .birthday(user.getBirthday())
                                 .gender(user.getGender())
                         .build())

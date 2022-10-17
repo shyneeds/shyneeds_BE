@@ -18,6 +18,9 @@ public class UpdateUserRequestDto {
     @ApiModelProperty(value = "이름", required = true)
     private String name;
 
+    @ApiModelProperty(value = "핸드폰 번호", required = true)
+    private String phoneNumber;
+
     @ApiModelProperty(value = "출생년도", required = true, example = "1950")
     private String year;
 

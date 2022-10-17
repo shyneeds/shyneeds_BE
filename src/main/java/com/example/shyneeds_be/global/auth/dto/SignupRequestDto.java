@@ -10,11 +10,20 @@ import java.sql.Date;
 @NoArgsConstructor
 @Getter
 public class SignupRequestDto {
+
     private String email;
+
     private String password;
+
     private String name;
+
+    private String phoneNumber;
+
     private String year;
+
     private String month;
+
     private String day;
+
     private String gender;
 }

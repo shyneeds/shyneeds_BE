@@ -82,6 +82,7 @@ public class OauthService {
                 .email(signupRequestDto.getEmail())
                 .password(password)
                 .name(signupRequestDto.getName())
+                .phoneNumber(signupRequestDto.getPhoneNumber())
                 .birthday(birthday)
                 .gender(signupRequestDto.getGender())
                 .role("USER")
