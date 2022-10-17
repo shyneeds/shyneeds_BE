@@ -28,7 +28,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh/{id}")
-    public ApiResponseDto<RecreatedAccessTokenResponseDto> validateRefreshToken(@PathVariable(name = "id") Long userId, @RequestBody ValidateRefreshRequestDto validateRefreshRequest){
+    public ApiResponseDto<RecreatedAccessTokenResponseDto> validateRefreshToken(@PathVariable(name = "id") Long userId, @RequestHeader("REFRESH_TOKEN") ValidateRefreshRequestDto validateRefreshRequest){
         return oauthService.validateRefreshToken(userId, validateRefreshRequest);
     }
 }

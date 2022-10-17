@@ -68,6 +68,7 @@ public class OauthService {
             if (user.getRefreshToken() != null){
                 refreshTokenRepository.delete(user.getRefreshToken());
             }
+
             RefreshToken refreshToken = RefreshToken.builder()
                     .refreshToken(token.getToken().getRefreshToken())
                     .user(user)
