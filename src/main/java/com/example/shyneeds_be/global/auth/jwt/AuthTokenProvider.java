@@ -3,6 +3,8 @@ package com.example.shyneeds_be.global.auth.jwt;
 import com.example.shyneeds_be.global.auth.dto.TokenInfoDto;
 import com.example.shyneeds_be.global.exception.TokenValidFailedException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,10 +31,32 @@ public class AuthTokenProvider {
 
     private final Key key;
 
-    private static final String AUTHORITIES_KEY = "auth";
+    private static final String AUTHORITIES_KEY = "role";
 
     public AuthTokenProvider(@Value(" ${jwt.secret-key}") String secretKey) {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+    }
+
+    public AuthToken validateRefreshToken(String refreshToken){
+        try {
+            // 검증
+            Jws<Claims> claims = Jwts.parser().setSigningKey(key).parseClaimsJws(refreshToken);
+
+            // refresh 토큰 기간이 만료되지 않았을 경우, 새로운 access 토큰 생성
+            if(!claims.getBody().getExpiration().before(new Date(System.currentTimeMillis()))) {
+                AuthToken authToken = recreationAccessToken(claims.getBody().get("sub").toString(), claims.getBody().get("role").toString());
+                return authToken;
+            } else{
+                return null;
+            }
+        } catch (Exception e){
+            throw e;
+        }
+    }
+
+    public AuthToken recreationAccessToken(String email, String role){
+        Date accessExpiryDate = getExpiryDate(accessTokenExpireTime);
+        return new AuthToken(email, role, accessExpiryDate, key);
     }
 
     public AuthToken generateToken(Authentication authentication, String email){
@@ -86,4 +110,6 @@ public class AuthTokenProvider {
             throw new TokenValidFailedException();
         }
     }
+
+
 }

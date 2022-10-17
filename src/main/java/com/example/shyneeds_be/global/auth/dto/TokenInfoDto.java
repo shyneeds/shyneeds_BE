@@ -10,6 +10,7 @@ import lombok.Data;
 public class TokenInfoDto {
     private String accessToken;
     private String refreshToken;
+    private String keyEmail;
 
     public TokenInfoDto(String accessToken){
         this.accessToken = accessToken;

@@ -1,9 +1,13 @@
 package com.example.shyneeds_be.global.auth.jwt;
 
 import com.example.shyneeds_be.global.auth.dto.TokenInfoDto;
+import com.example.shyneeds_be.global.network.response.ApiResponseDto;
+import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import io.jsonwebtoken.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.parameters.P;
+
 import java.security.Key;
 import java.sql.Date;
 
@@ -22,16 +26,39 @@ public class AuthToken {
         this.token = createAuthToken(email, role, accessExpiry, refreshExpiry);
     }
 
-    private TokenInfoDto createAuthToken(String email, String role, Date accessExpiry, Date refreshExpiry) {
+    public AuthToken(String email, String role, Date accessExpiry, Key key){
+        this.key = key;
+        this.token = recreateAccessToken(email, role, accessExpiry);
+    }
+
+    private TokenInfoDto recreateAccessToken(String email, String role, Date accessExpiry) {
+        Claims claims = Jwts.claims().setSubject(email);
+        claims.put("role", role);
 
         String accessToken = Jwts.builder()
-                .setSubject(email)
-                .claim(AUTHORITIES_KEY, role)
+                .setClaims(claims)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .setExpiration(accessExpiry)
+                .compact();
+
+        return TokenInfoDto.builder()
+                .accessToken(accessToken)
+                .keyEmail(email)
+                .build();
+    }
+
+    private TokenInfoDto createAuthToken(String email, String role, Date accessExpiry, Date refreshExpiry) {
+        Claims claims = Jwts.claims().setSubject(email);
+        claims.put("role", role);
+
+        String accessToken = Jwts.builder()
+                .setClaims(claims)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .setExpiration(accessExpiry)
                 .compact();
 
         String refreshToken = Jwts.builder()
+                .setClaims(claims)
                 .setExpiration(refreshExpiry)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -39,12 +66,16 @@ public class AuthToken {
         return TokenInfoDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .keyEmail(email)
                 .build();
     }
 
     public boolean validate() {
         return this.getTokenClaims() != null;
     }
+
+
+
 
     public Claims getTokenClaims() {
         try {
@@ -59,12 +90,14 @@ public class AuthToken {
             log.info("Invalid JWT token.");
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT token.");
+            throw e;
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT token.");
         } catch (IllegalArgumentException e) {
             log.info("JWT token compact of handler are invalid.");
+        } catch (Exception e){
+            log.error("Exception ERROR: {}", e.getMessage());
         }
         return null;
     }
-
 }

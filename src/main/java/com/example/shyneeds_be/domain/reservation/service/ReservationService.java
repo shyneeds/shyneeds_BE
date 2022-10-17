@@ -32,6 +32,7 @@ public class ReservationService {
     public ApiResponseDto addReservation(Long userId, AddReservationRequestDto addReservationRequest){
         try {
             User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("없는 사용자입니다."));
+
             Reservation reservation = Reservation.builder()
                     .paymentMethod(addReservationRequest.getPaymentMethod())
                     .paymentAccountBank(addReservationRequest.getPaymentAccountBank())
@@ -44,6 +45,7 @@ public class ReservationService {
                     .reservationNumber(createReservationNumber())
                     .user(user)
                     .build();
+
             reservationRepository.save(reservation);
 
             for (ReservationPackageRequestDto reservationPackageRequest : addReservationRequest.getReservationPackages()) {
@@ -59,6 +61,7 @@ public class ReservationService {
                         .build();
                 reservationPackageRepository.save(reservationPackage);
             }
+
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "예약에 성공했습니다.");
         } catch (Exception e){
             return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "예약에 실패했습니다." + e.getMessage());

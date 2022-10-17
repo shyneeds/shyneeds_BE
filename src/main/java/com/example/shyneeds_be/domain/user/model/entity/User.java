@@ -70,16 +70,13 @@ public class User {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @Column(name = "refresh_token")
-    private String refreshToken;
+    @OneToOne
+    @JoinColumn(name = "refresh_token_id")
+    private RefreshToken refreshToken;
 
     @JsonBackReference
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Cart> carts;
-
-    public void saveRefreshToken(String refreshToken){
-        this.refreshToken = refreshToken;
-    }
 
     public void updateInfo(String password, String name, String phoneNumber, Date birthday, String gender) {
         this.password = password;
@@ -111,5 +108,9 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.birthday = birthday;
         this.gender = gender;
+    }
+
+    public void saveRefreshToken(RefreshToken refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
