@@ -12,19 +12,16 @@ import lombok.NoArgsConstructor;
 public class ReservationPackageRequestDto {
 
     @ApiModelProperty(value = "필수옵션 이름", required = true, example = "성별")
-    private String selectRequiredOptionName;
+    private String title;
 
     @ApiModelProperty(value = "필수옵션 값", required = true, example = "남성")
-    private String selectRequiredOptionValues;
-
-    @ApiModelProperty(value = "선택옵션 이름", required = true, example = "싱글룸")
-    private String selectOptionalName;
-
-    @ApiModelProperty(value = "선택옵션 값", required = true, example = "객실 1인 사용료")
-    private String selectOptionalValues;
+    private String optionValue;
 
     @ApiModelProperty(value = "예약 가격", required = true, example = "3,000,000")
-    private String reservation_price;
+    private String price;
+
+    @ApiModelProperty(value = "필수 옵션 여부", required = true, example = "1")
+    private boolean optionFlg;
 
     @ApiModelProperty(value = "수량", required = true, example = "1")
     private Integer quantity;

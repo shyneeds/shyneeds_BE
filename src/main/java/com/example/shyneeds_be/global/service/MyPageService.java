@@ -102,12 +102,13 @@ public class MyPageService {
 
             myPageReservationPackageResponseList.add(
                     MyPageReservationPackageResponseDto.builder()
-                            .packageId(reservationPackage.getId())
+                            .packageId(reservationPackage.getTravelPackage().getId())
                             .imageUrl(imageDir)
                             .title(reservationPackage.getTravelPackage().getTitle())
-                            .optionName(reservationPackage.getSelectOptionalName()) // 일단 선택옵션 이름
-                            .optionValue(reservationPackage.getSelectOptionalValues()) // 일단 선택옵션 내용
-                            .price(reservationPackage.getReservation_price())
+                            .optionTitle(reservationPackage.getTitle())
+                            .optionValue(reservationPackage.getOptionValue())
+                            .price(reservationPackage.getPrice())
+                            .optionFlg(reservationPackage.isOptionFlg())
                             .build()
             );
         }

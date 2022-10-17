@@ -25,20 +25,17 @@ public class ReservationPackage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "select_required_option_name")
-    private String selectRequiredOptionName;
+    @Column(name = "option_title")
+    private String title;
 
-    @Column(name = "select_required_option_values")
-    private  String selectRequiredOptionValues;
+    @Column(name = "option_value")
+    private String optionValue;
 
-    @Column(name = "select_optional_name")
-    private String selectOptionalName;
+    @Column(name = "price")
+    private String price;
 
-    @Column(name = "select_optional_values")
-    private String selectOptionalValues;
-
-    @Column(name = "reservation_price")
-    private String reservation_price;
+    @Column(name = "option_flg")
+    private boolean optionFlg;
 
     @Column(name = "quantity")
     private Integer quantity;

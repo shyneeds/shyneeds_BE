@@ -22,11 +22,14 @@ public class MyPageReservationPackageResponseDto {
     private String title;
 
     @ApiModelProperty(value = "옵션 이름", required = false, example = "")
-    private String optionName;
+    private String optionTitle;
 
     @ApiModelProperty(value = "옵션 내용", required = false, example = "")
     private String optionValue;
 
     @ApiModelProperty(value = "가격", required = false, example = "")
     private String price;
+
+    @ApiModelProperty(value = "필수 옵션 여부", required = false, example = "true")
+    private boolean optionFlg;
 }

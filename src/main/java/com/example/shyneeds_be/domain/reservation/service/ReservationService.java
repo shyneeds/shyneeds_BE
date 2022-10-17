@@ -50,12 +50,11 @@ public class ReservationService {
 
             for (ReservationPackageRequestDto reservationPackageRequest : addReservationRequest.getReservationPackages()) {
                 ReservationPackage reservationPackage = ReservationPackage.builder()
-                        .selectRequiredOptionName(reservationPackageRequest.getSelectRequiredOptionName())
-                        .selectRequiredOptionValues(reservationPackageRequest.getSelectRequiredOptionValues())
-                        .selectOptionalName(reservationPackageRequest.getSelectOptionalName())
-                        .selectOptionalValues(reservationPackageRequest.getSelectOptionalValues())
+                        .title(reservationPackageRequest.getTitle())
+                        .optionValue(reservationPackageRequest.getOptionValue())
+                        .price(reservationPackageRequest.getPrice())
+                        .optionFlg(reservationPackageRequest.isOptionFlg())
                         .quantity(reservationPackageRequest.getQuantity())
-                        .reservation_price(reservationPackageRequest.getReservation_price())
                         .travelPackage(travelPackageRepository.findByPackageId(reservationPackageRequest.getTravelPackageId()))
                         .reservation(reservation)
                         .build();
