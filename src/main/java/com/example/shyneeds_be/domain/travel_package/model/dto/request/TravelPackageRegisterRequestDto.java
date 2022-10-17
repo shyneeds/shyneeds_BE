@@ -32,20 +32,8 @@ public class TravelPackageRegisterRequestDto {
     @ApiModelProperty(value = "요약", required = false, example = "9월 대한항공 전세기 직항 이용\n 산토리니 특급 2박, 특급호텔 총 7박\n 모든 것이 포함된 풀패키지 여행")
     private String summary;
 
-    @ApiModelProperty(value = "필수 옵션 이름", required = true, example = "출발일")
-    private String requiredOptionName;
-
-    @ApiModelProperty(value = "필수 옵션 값", required = true, example = "2022.12.02(금)출발~2022.12.29(목)도착")
-    private String requiredOptionValues;
-
-    @ApiModelProperty(value = "옵션 이름", required = false, example = "싱글차지")
-    private String optionalName;
-
-    @ApiModelProperty(value = "옵션 값", required = false, example = "1인 싱글룸 사용시 추가")
-    private String optionalValues;
-
-    @ApiModelProperty(value = "항공기 정보", required = false, example = "대한항공 전세기 직항")
-    private String flightInfo;
+    @ApiModelProperty(value = "옵션", required = false, example = "")
+    private List<PackageOptionRequestDto> packageOptionRequestDtoList;
 
     @ApiModelProperty(value = "재고 여부", required = true, example = "false or 0")
     private boolean soldoutFlg;

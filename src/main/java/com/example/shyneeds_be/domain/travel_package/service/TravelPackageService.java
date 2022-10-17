@@ -3,9 +3,14 @@ package com.example.shyneeds_be.domain.travel_package.service;
 import com.example.shyneeds_be.domain.category.model.entity.Category;
 import com.example.shyneeds_be.domain.category.model.response.CategoryResponseDto;
 import com.example.shyneeds_be.domain.category.repository.CategoryRepository;
+import com.example.shyneeds_be.domain.travel_package.model.dto.request.PackageOptionRequestDto;
 import com.example.shyneeds_be.domain.travel_package.model.dto.request.TravelPackageRegisterRequestDto;
+import com.example.shyneeds_be.domain.travel_package.model.dto.response.DetailPackageResponseDto;
+import com.example.shyneeds_be.domain.travel_package.model.dto.response.PackageOptionResponseDto;
 import com.example.shyneeds_be.domain.travel_package.model.dto.response.TravelPackageResponseDto;
+import com.example.shyneeds_be.domain.travel_package.model.entitiy.PackageOption;
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.TravelPackage;
+import com.example.shyneeds_be.domain.travel_package.repository.PackageOptionRepository;
 import com.example.shyneeds_be.domain.travel_package.repository.TravelPackageRepository;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
@@ -19,10 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,14 +36,37 @@ public class TravelPackageService {
     private final ItemS3Uploader itemS3Uploader;
     private final TravelPackageRepository travelPackageRepository;
     private final CategoryRepository categoryRepository;
+    private final PackageOptionRepository packageOptionRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+
+    public ApiResponseDto<DetailPackageResponseDto> getPackageDetail(Long id){
+        try{
+
+            // 상품 정보
+            TravelPackage travelPackage = travelPackageRepository.findById(id).orElseThrow(() -> new NoSuchElementException("조회되는 상품이 없습니다."));
+            TravelPackageResponseDto travelPackageResponseDto = response(travelPackage);
+
+            // 연관 상품 리스트
+            List<TravelPackageResponseDto> relatedPackageList = travelPackageRepository.findRelatedPackageList(id).stream().map(this::response).toList();
+            DetailPackageResponseDto detailPackageResponseDto = DetailPackageResponseDto.builder()
+                    .travelPackageResponseDto(travelPackageResponseDto)
+                    .relatedPackageList(relatedPackageList)
+                    .build();
+
+
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", detailPackageResponseDto);
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다." + e.getMessage());
+        }
+    }
 
     /*
     ADMIN 기능 : 상품 등록
     */
     public ApiResponseDto register(TravelPackageRegisterRequestDto travelPackageRegisterRequestDto, MultipartFile mainImage, List<MultipartFile> descriptionImageList){
+
 
         try{
             if (mainImage != null) {
@@ -54,6 +79,7 @@ public class TravelPackageService {
                     String mainImageUrl = uploadS3MainImage(mainImage, title);
                     String descriptionImageUrl = uploadS3DescriptionImage(descriptionImageList, title);
 
+                    // 패키지 저장
                     TravelPackage travelPackage = TravelPackage.builder()
                             .title(title)
                             .categoryIds(removeBracket(travelPackageRegisterRequestDto.getCategoryIds()))
@@ -63,11 +89,6 @@ public class TravelPackageService {
                             .descriptionImage(descriptionImageUrl)
                             .price(travelPackageRegisterRequestDto.getPrice())
                             .summary(travelPackageRegisterRequestDto.getSummary())
-                            .requiredOptionName(travelPackageRegisterRequestDto.getRequiredOptionName())
-                            .requiredOptionValues(travelPackageRegisterRequestDto.getRequiredOptionValues())
-                            .optionalName(travelPackageRegisterRequestDto.getOptionalName())
-                            .optionalValues(travelPackageRegisterRequestDto.getOptionalValues())
-                            .flightInfo(travelPackageRegisterRequestDto.getFlightInfo())
                             .soldoutFlg(travelPackageRegisterRequestDto.isSoldoutFlg())
                             .dispFlg(travelPackageRegisterRequestDto.isDispFlg())
                             .createdAt(Timestamp.valueOf(LocalDateTime.now()))
@@ -75,7 +96,26 @@ public class TravelPackageService {
                             .searchKeyword(removeBracket(travelPackageRegisterRequestDto.getSearchKeyword()))
                             .build();
 
-                    travelPackageRepository.save(travelPackage);
+                    TravelPackage saveTravelPackage = travelPackageRepository.save(travelPackage);
+
+                    // 패키지 옵션 저장
+                    if(travelPackageRegisterRequestDto.getPackageOptionRequestDtoList() != null){
+                        List<PackageOptionRequestDto> packageOptionRequestDtoList = travelPackageRegisterRequestDto.getPackageOptionRequestDtoList();
+
+                        for (PackageOptionRequestDto packageOptionRequestDto : packageOptionRequestDtoList) {
+                            PackageOption savePackageOption = PackageOption.builder()
+                                    .title(packageOptionRequestDto.getTitle())
+                                    .optionValue(packageOptionRequestDto.getOptionValue())
+                                    .travelPackage(saveTravelPackage)
+                                    .price(packageOptionRequestDto.getPrice())
+                                    .optionFlg(packageOptionRequestDto.isOptionFlg())
+                                    .createdAt(Timestamp.valueOf(LocalDateTime.now()))
+                                    .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                                    .build();
+
+                            packageOptionRepository.save(savePackageOption);
+                        }
+                    }
 
 
                 } else {
@@ -111,10 +151,15 @@ public class TravelPackageService {
     }
 
     /*--------------------------------[어드민] 상품 리스트 조회------------------------------------ */
-    public ApiResponseDto<List<TravelPackageResponseDto>> getAdminPackageList() {
+    public ApiResponseDto<List<TravelPackageResponseDto>> getAdminPackageList(String title) {
        try{
 
-           List<TravelPackageResponseDto> travelPackageResponseDtoList = travelPackageRepository.findAll().stream().map(this::response).toList();
+           List<TravelPackageResponseDto> travelPackageResponseDtoList = new ArrayList<>();
+           if(title.equals("all")) {
+               travelPackageResponseDtoList = travelPackageRepository.findAll().stream().map(this::response).toList();
+           } else {
+               travelPackageResponseDtoList = travelPackageRepository.findSearchPackageList(title).stream().map(this::response).toList();
+           }
 
            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", travelPackageResponseDtoList);
        } catch (Exception e){
@@ -165,7 +210,6 @@ public class TravelPackageService {
 
 
 
-
     private TravelPackageResponseDto response(TravelPackage travelPackage){
 
         List<CategoryResponseDto> categoryResponseDtoList = new ArrayList<>();
@@ -177,7 +221,6 @@ public class TravelPackageService {
                 categoryResponseDtoList.add(responseCategoryResponse(optionalCategory.get()));
             }
         }
-
 
 
         String imageDir = "https://shyneeds.s3.ap-northeast-2.amazonaws.com/package/"+
@@ -193,6 +236,9 @@ public class TravelPackageService {
             searchKeywordList.add(skSt.nextToken());
         }
 
+
+        // package option
+        Map<String, List<PackageOptionResponseDto>> packageOptionMap = responsePackageOptionMap(travelPackage.getPackageOptionList());
         return TravelPackageResponseDto.builder()
                 .id(travelPackage.getId())
                 .title(travelPackage.getTitle())
@@ -202,17 +248,46 @@ public class TravelPackageService {
                 .descriptionImage(descriptionImageUrlList)
                 .price(travelPackage.getPrice())
                 .summary(travelPackage.getSummary())
-                .requiredOptionName(travelPackage.getRequiredOptionName())
-                .requiredOptionValues(travelPackage.getRequiredOptionValues())
-                .optionalName(travelPackage.getOptionalName())
-                .optionalValues(travelPackage.getOptionalValues())
-                .flightInfo(travelPackage.getFlightInfo())
+                .packageOptionResponseDto(packageOptionMap)
                 .soldoutFlg(travelPackage.isSoldoutFlg())
                 .dispFlg(travelPackage.isDispFlg())
                 .createdAt(travelPackage.getCreatedAt())
                 .updatedAt(travelPackage.getUpdatedAt())
                 .searchKeyword(searchKeywordList)
                 .build();
+    }
+
+    private Map<String, List<PackageOptionResponseDto>> responsePackageOptionMap(List<PackageOption> packageOptionList){
+        Map<String, List<PackageOptionResponseDto>> packageOptionMap = new HashMap<>();
+
+        List<PackageOptionResponseDto> packageOptionResponseDtoList = new ArrayList<>();
+
+        // packageOption 순회
+        for (PackageOption packageOption : packageOptionList) {
+            // map의 키에 packageOption 타이틀 (키값)이 없으면 키값으로 사용
+            if(!packageOptionMap.containsKey(packageOption.getTitle())) {
+                // 키 값 변경 시 새로운 리스트로 초기화
+                packageOptionResponseDtoList = new ArrayList<>();
+            }
+
+            PackageOptionResponseDto packageOptionResponseDto = PackageOptionResponseDto.builder()
+                        .id(packageOption.getId())
+                        .title(packageOption.getTitle())
+                        .optionValue(packageOption.getOptionValue())
+                        .price(packageOption.getPrice())
+                        .optionFlg(packageOption.isOptionFlg())
+                        .createdAt(packageOption.getCreatedAt())
+                        .updatedAt(packageOption.getUpdatedAt())
+                        .build();
+
+                packageOptionResponseDtoList.add(packageOptionResponseDto);;
+
+                packageOptionMap.put(packageOption.getTitle(), packageOptionResponseDtoList);
+
+
+        }
+
+        return packageOptionMap;
     }
 
     private String removeBracket(List list){
