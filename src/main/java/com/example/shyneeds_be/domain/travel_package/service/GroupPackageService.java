@@ -34,10 +34,10 @@ public class GroupPackageService {
     }
 
     // 서브 카테고리 별 여행 리스트
-    public ApiResponseDto<List<GroupPackageResponseDto>> getGroupPackageListBySubCategory(String name){
+    public ApiResponseDto<List<GroupPackageResponseDto>> getGroupPackageListBySubCategory(String name, String sortFlg){
         try{
 
-            List<GroupPackageResponseDto> groupPackageResponseDtoList = groupPackageRepository.findBySubTitle(name).stream().map(this::responseGroupPackage).toList();
+            List<GroupPackageResponseDto> groupPackageResponseDtoList = groupPackageRepository.findBySubTitle(name, sortFlg).stream().map(this::responseGroupPackage).toList();
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", groupPackageResponseDtoList);
         } catch (Exception e){
             return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다." + e.getMessage());

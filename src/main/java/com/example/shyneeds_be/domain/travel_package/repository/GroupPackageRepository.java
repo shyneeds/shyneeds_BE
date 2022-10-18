@@ -35,7 +35,11 @@ public interface GroupPackageRepository extends JpaRepository<TravelPackage, Lon
             "AND " +
             "soldout_flg = 0 AND deleted_flg = 0 " +
             "GROUP BY TP.id " +
-            "ORDER BY TP.updated_at DESC "
+            "ORDER BY " +
+            "(CASE WHEN :sortFlg='current' THEN TP.updated_at END) DESC," +
+            "(CASE WHEN :sortFlg='high' THEN TP.price END) DESC, " +
+            "(CASE WHEN :sortFlg='low' THEN TP.price END) ASC"
             ,nativeQuery = true)
-    List<GroupPackage> findBySubTitle(@Param("name") String name);
+    List<GroupPackage> findBySubTitle(@Param("name") String name, @Param("sortFlg") String sortFlg);
+
 }
