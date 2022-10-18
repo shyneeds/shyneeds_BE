@@ -43,6 +43,7 @@ public class TravelPackageService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    // 상품 상세 보기
     public ApiResponseDto<DetailPackageResponseDto> getPackageDetail(Long id){
         try{
 
@@ -63,6 +64,8 @@ public class TravelPackageService {
             return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다." + e.getMessage());
         }
     }
+
+
 
     /*
     ADMIN 기능 : 상품 등록
@@ -313,7 +316,5 @@ public class TravelPackageService {
                 .build();
 
     }
-
-
 
 }
