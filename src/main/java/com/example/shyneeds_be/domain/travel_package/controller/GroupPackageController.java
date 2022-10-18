@@ -29,8 +29,8 @@ public class GroupPackageController {
 
     @ApiOperation(value = "서브 카테고리 별 그룹 여행")
     @GetMapping("/sub")
-    public ApiResponseDto<List<GroupPackageResponseDto>> getGroupPackageListBySubCategory(@PathParam("name") String name){
-        return groupPackageService.getGroupPackageListBySubCategory(name);
+    public ApiResponseDto<List<GroupPackageResponseDto>> getGroupPackageListBySubCategory(@PathParam("name") String name, @PathParam("sortFlg") String sortFlg){
+        return groupPackageService.getGroupPackageListBySubCategory(name, sortFlg);
     }
 
 }
