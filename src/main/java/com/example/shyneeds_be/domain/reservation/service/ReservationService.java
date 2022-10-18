@@ -2,6 +2,10 @@ package com.example.shyneeds_be.domain.reservation.service;
 
 import com.example.shyneeds_be.domain.reservation.model.dto.request.AddReservationRequestDto;
 import com.example.shyneeds_be.domain.reservation.model.dto.request.ReservationPackageRequestDto;
+import com.example.shyneeds_be.domain.reservation.model.dto.response.PaymentInfoDto;
+import com.example.shyneeds_be.domain.reservation.model.dto.response.ReservationDetailResponseDto;
+import com.example.shyneeds_be.domain.reservation.model.dto.response.ReservationPackageDetailDto;
+import com.example.shyneeds_be.domain.reservation.model.dto.response.ReservatorInfoDto;
 import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
 import com.example.shyneeds_be.domain.reservation.model.enums.ReservationStatus;
 import com.example.shyneeds_be.domain.reservation.repository.ReservationRepository;
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -43,6 +48,9 @@ public class ReservationService {
                     .totalReservationAmount(addReservationRequest.getTotalReservationAmount())
                     .reservationStatus(ReservationStatus.입금대기)
                     .reservationNumber(createReservationNumber())
+                    .reservatorName(addReservationRequest.getReservatorName())
+                    .reservatorPhoneNumber(addReservationRequest.getReservatorPhoneNumber())
+                    .reservatorEmail(addReservationRequest.getReservatorEmail())
                     .user(user)
                     .build();
 
@@ -86,6 +94,73 @@ public class ReservationService {
         }
 
         return date+resultNum;
+    }
+
+    /*
+        예약 상세 조회
+    */
+    public ApiResponseDto<ReservationDetailResponseDto> selectReservationDetail(String reservationNumber) {
+        try{
+            System.out.println(reservationNumber);
+            if(reservationRepository.findByReservationNumber(reservationNumber) != null){
+                Reservation reservation = reservationRepository.findByReservationNumber(reservationNumber);
+                return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "예약 조회에 성공했습니다",
+                        ReservationDetailResponseDto.builder()
+                                .reservatedAt(reservation.getCreatedAt())
+                                .reservationNumber(reservation.getReservationNumber())
+                                .reservationPackageList(this.getReservationPackageList(reservation))
+                                .reservatorInfo(this.getReservatorInfo(reservation))
+                                .paymentInfo(this.getPaymentInfo(reservation))
+                                .build());
+            } else {
+                return ApiResponseDto.of(ResponseStatusCode.NO_CONTENT.getValue(), "해당 예약번호의 예약이 없습니다.");
+            }
+
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "예약 조회에 실패했습니다. " + e.getMessage());
+        }
+    }
+
+    private PaymentInfoDto getPaymentInfo(Reservation reservation) {
+        return PaymentInfoDto.builder()
+                .totalReservationAmount(reservation.getTotalReservationAmount())
+                .paymentMethod(reservation.getPaymentMethod())
+                .paymentAccountBank(reservation.getPaymentAccountBank())
+                .paymentAccountNumber(reservation.getPaymentAccountNumber())
+                .paymentAccountHolder(reservation.getPaymentAccountHolder())
+                .depositorName(reservation.getDepositorName())
+                .build();
+    }
+
+    private ReservatorInfoDto getReservatorInfo(Reservation reservation) {
+        return ReservatorInfoDto.builder()
+                .reservatorName(reservation.getReservatorName())
+                .reservatorPhoneNumber(reservation.getReservatorPhoneNumber())
+                .reservatorEmail(reservation.getReservatorEmail())
+                .build();
+    }
+
+    private List<ReservationPackageDetailDto> getReservationPackageList(Reservation reservation) {
+        List<ReservationPackage> reservationPackageList = reservationPackageRepository.findAllByReservationId(reservation.getId());
+        List<ReservationPackageDetailDto> reservationPackageDetaiList = null;
+
+        for (ReservationPackage reservationPackage : reservationPackageList){
+
+            String imageDir = "https://shyneeds.s3.ap-northeast-2.amazonaws.com/package/"+
+                    reservationPackage.getTravelPackage().getTitle()+"/main/"+reservationPackage.getTravelPackage().getMainImage();
+
+            reservationPackageDetaiList.add(
+                    ReservationPackageDetailDto.builder()
+                            .packageImage(imageDir)
+                            .optionTitle(reservationPackage.getOptionTitle())
+                            .optionValue(reservationPackage.getOptionValue())
+                            .price(reservationPackage.getPrice())
+                            .optionFlg(reservationPackage.isOptionFlg())
+                            .quantity(reservationPackage.getQuantity())
+                            .travelPackageId(reservationPackage.getTravelPackage().getId())
+                            .build());
+        }
+        return reservationPackageDetaiList;
     }
 }
 

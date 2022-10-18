@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
 import java.util.List;
 
 @AllArgsConstructor
@@ -36,5 +35,14 @@ public class AddReservationRequestDto {
 
     @ApiModelProperty(value = "약관 동의 여부", required = true, example = "true")
     private Boolean serviceTerms;
+
+    @ApiModelProperty(value = "예약자 이름", required = true, example = "홍길동")
+    private String reservatorName;
+
+    @ApiModelProperty(value = "예약자 전화번호", required = true, example = "010-1234-1234")
+    private String reservatorPhoneNumber;
+
+    @ApiModelProperty(value = "예약자 이메일", required = true, example = "email2@gmail.com")
+    private String reservatorEmail;
 
 }

@@ -20,7 +20,7 @@ public class ReservationPackageRequestDto {
     @ApiModelProperty(value = "예약 가격", required = true, example = "3,000,000")
     private String price;
 
-    @ApiModelProperty(value = "필수 옵션 여부", required = true, example = "1")
+    @ApiModelProperty(value = "필수 옵션 여부", required = true, example = "true")
     private boolean optionFlg;
 
     @ApiModelProperty(value = "수량", required = true, example = "1")

@@ -57,6 +57,15 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus; // 예약상태
 
+    @Column(name = "reservator_name")
+    private String reservatorName;
+
+    @Column(name = "reservator_phone_number")
+    private String reservatorPhoneNumber;
+
+    @Column(name = "reservator_email")
+    private String reservatorEmail;
+
     @CreatedDate
     @Column(name = "created_at")
     private Timestamp createdAt;
