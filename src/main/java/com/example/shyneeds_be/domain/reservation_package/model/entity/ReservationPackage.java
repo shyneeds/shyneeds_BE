@@ -26,7 +26,7 @@ public class ReservationPackage {
     private Long id;
 
     @Column(name = "option_title")
-    private String title;
+    private String optionTitle;
 
     @Column(name = "option_value")
     private String optionValue;

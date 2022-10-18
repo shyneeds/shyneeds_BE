@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ReservationPackageRequestDto {
 
-    @ApiModelProperty(value = "필수옵션 이름", required = true, example = "성별")
-    private String title;
+    @ApiModelProperty(value = "옵션 이름", required = true, example = "성별")
+    private String optionTitle;
 
-    @ApiModelProperty(value = "필수옵션 값", required = true, example = "남성")
+    @ApiModelProperty(value = "옵션 값", required = true, example = "남성")
     private String optionValue;
 
     @ApiModelProperty(value = "예약 가격", required = true, example = "3,000,000")

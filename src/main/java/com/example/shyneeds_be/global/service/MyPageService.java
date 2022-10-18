@@ -105,7 +105,7 @@ public class MyPageService {
                             .packageId(reservationPackage.getTravelPackage().getId())
                             .imageUrl(imageDir)
                             .title(reservationPackage.getTravelPackage().getTitle())
-                            .optionTitle(reservationPackage.getTitle())
+                            .optionTitle(reservationPackage.getOptionTitle())
                             .optionValue(reservationPackage.getOptionValue())
                             .price(reservationPackage.getPrice())
                             .optionFlg(reservationPackage.isOptionFlg())

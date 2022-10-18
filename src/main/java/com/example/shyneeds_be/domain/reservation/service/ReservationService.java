@@ -50,7 +50,7 @@ public class ReservationService {
 
             for (ReservationPackageRequestDto reservationPackageRequest : addReservationRequest.getReservationPackages()) {
                 ReservationPackage reservationPackage = ReservationPackage.builder()
-                        .title(reservationPackageRequest.getTitle())
+                        .optionTitle(reservationPackageRequest.getOptionTitle())
                         .optionValue(reservationPackageRequest.getOptionValue())
                         .price(reservationPackageRequest.getPrice())
                         .optionFlg(reservationPackageRequest.isOptionFlg())
