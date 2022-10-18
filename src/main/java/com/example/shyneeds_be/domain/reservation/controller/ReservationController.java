@@ -23,10 +23,9 @@ public class ReservationController {
         return reservationService.addReservation(userId, addReservationRequest);
     }
 
-    @ApiOperation(value = "[유저] 예약정보 조회")
-    @GetMapping("/user")
-    public ApiResponseDto<ReservationDetailResponseDto> selectReservationDetail(@PathParam("reservation_number") String reservationNumber){
-        System.out.println(reservationNumber);
-        return reservationService.selectReservationDetail(reservationNumber);
+    @ApiOperation(value = "예약정보 조회")
+    @GetMapping("")
+    public ApiResponseDto<ReservationDetailResponseDto> getReservationDetail(@RequestParam(name = "reservation_number") String reservationNumber){
+        return reservationService.getReservationDetail(reservationNumber);
     }
 }

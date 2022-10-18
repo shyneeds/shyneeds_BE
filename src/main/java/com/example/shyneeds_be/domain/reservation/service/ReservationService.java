@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -99,9 +100,9 @@ public class ReservationService {
     /*
         예약 상세 조회
     */
-    public ApiResponseDto<ReservationDetailResponseDto> selectReservationDetail(String reservationNumber) {
+    public ApiResponseDto<ReservationDetailResponseDto> getReservationDetail(String reservationNumber) {
         try{
-            System.out.println(reservationNumber);
+            System.out.println(reservationRepository.findByReservationNumber(reservationNumber));
             if(reservationRepository.findByReservationNumber(reservationNumber) != null){
                 Reservation reservation = reservationRepository.findByReservationNumber(reservationNumber);
                 return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "예약 조회에 성공했습니다",
@@ -142,7 +143,7 @@ public class ReservationService {
 
     private List<ReservationPackageDetailDto> getReservationPackageList(Reservation reservation) {
         List<ReservationPackage> reservationPackageList = reservationPackageRepository.findAllByReservationId(reservation.getId());
-        List<ReservationPackageDetailDto> reservationPackageDetaiList = null;
+        List<ReservationPackageDetailDto> reservationPackageDetaiList = new ArrayList<>();
 
         for (ReservationPackage reservationPackage : reservationPackageList){
 
