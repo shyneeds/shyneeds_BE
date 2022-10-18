@@ -107,6 +107,7 @@ public class MyPageService {
                             .title(reservationPackage.getTravelPackage().getTitle())
                             .optionTitle(reservationPackage.getOptionTitle())
                             .optionValue(reservationPackage.getOptionValue())
+                            .quantity(reservationPackage.getQuantity())
                             .price(reservationPackage.getPrice())
                             .optionFlg(reservationPackage.isOptionFlg())
                             .build()

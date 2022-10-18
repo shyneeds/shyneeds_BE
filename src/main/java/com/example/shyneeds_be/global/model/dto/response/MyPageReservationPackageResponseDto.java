@@ -27,6 +27,9 @@ public class MyPageReservationPackageResponseDto {
     @ApiModelProperty(value = "옵션 내용", required = false, example = "")
     private String optionValue;
 
+    @ApiModelProperty(value = "수량", required = false, example = "1")
+    private Integer quantity;
+
     @ApiModelProperty(value = "가격", required = false, example = "")
     private String price;
 
