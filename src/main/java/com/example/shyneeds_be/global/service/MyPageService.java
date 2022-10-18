@@ -54,6 +54,7 @@ public class MyPageService {
                                 .phoneNumber(user.getPhoneNumber())
                                 .birthday(user.getBirthday())
                                 .gender(user.getGender())
+                                .totalPaymentAmount(user.getTotalPaymentAmount())
                         .build())
                 .reservationList(myPageReservationResponse(user.getId()))
                 .build();

@@ -29,4 +29,6 @@ public class MyPageUserResponseDto {
     private Date birthday;
 
     private String gender;
+
+    private Long totalPaymentAmount;
 }
