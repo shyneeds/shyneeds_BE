@@ -66,6 +66,12 @@ public class Reservation {
     @Column(name = "reservator_email")
     private String reservatorEmail;
 
+    @Column(name = "cancel_reason")
+    private String cancelReason;
+
+    @Column(name = "cancel_reason_detail")
+    private String cancelReasonDetail;
+
     @CreatedDate
     @Column(name = "created_at")
     private Timestamp createdAt;
@@ -73,6 +79,7 @@ public class Reservation {
     @LastModifiedDate
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
 
     @JsonBackReference
     @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -83,4 +90,9 @@ public class Reservation {
     private User user;
 
 
+    public void cancelReservation(String cancelReason, String cancelResonDetail) {
+        this.reservationStatus = ReservationStatus.예약취소;
+        this.cancelReason = cancelReason;
+        this.cancelReasonDetail = cancelResonDetail;
+    }
 }

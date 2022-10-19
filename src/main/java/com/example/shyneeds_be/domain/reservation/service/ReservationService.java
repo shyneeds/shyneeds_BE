@@ -1,6 +1,7 @@
 package com.example.shyneeds_be.domain.reservation.service;
 
 import com.example.shyneeds_be.domain.reservation.model.dto.request.AddReservationRequestDto;
+import com.example.shyneeds_be.domain.reservation.model.dto.request.CancelReservationRequestDto;
 import com.example.shyneeds_be.domain.reservation.model.dto.request.ReservationPackageRequestDto;
 import com.example.shyneeds_be.domain.reservation.model.dto.response.PaymentInfoDto;
 import com.example.shyneeds_be.domain.reservation.model.dto.response.ReservationDetailResponseDto;
@@ -163,5 +164,27 @@ public class ReservationService {
         }
         return reservationPackageDetaiList;
     }
+
+    public ApiResponseDto cancelReservation(Long userId ,String reservationNumber, CancelReservationRequestDto cancelReservationRequest) {
+        try {
+            if (reservationRepository.findByReservationNumber(reservationNumber) != null) {
+                if (reservationRepository.findAllByUserId(userId).contains(reservationRepository.findByReservationNumber(reservationNumber))) {
+                    Reservation reservation = reservationRepository.findByReservationNumber(reservationNumber);
+                    reservation.cancelReservation(cancelReservationRequest.getCancelReason(), cancelReservationRequest.getCancelReasonDetail());
+                    reservationRepository.save(reservation);
+                    return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "예약이 취소되었습니다.");
+                } else {
+                    return ApiResponseDto.of(ResponseStatusCode.FORBIDDEN.getValue(), "해당 유저의 예약번호가 아닙니다.");ㄹ
+                }
+            } else {
+                return ApiResponseDto.of(ResponseStatusCode.NO_CONTENT.getValue(), "해당 예약번호의 예약이 없습니다.");
+            }
+
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "예약취소에 실패했습니다 " + e.getMessage());
+        }
+
+    }
+
 }
 
