@@ -3,6 +3,7 @@ package com.example.shyneeds_be.domain.cart.model.entity;
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.TravelPackage;
 import com.example.shyneeds_be.domain.user.model.entity.User;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,6 +18,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 @EntityListeners(AuditingEntityListener.class)
 public class Cart { // 관심상품
 
@@ -24,23 +26,20 @@ public class Cart { // 관심상품
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "select_required_option_name")
-    private String selectRequiredOptionName;
+    @Column(name = "option_title")
+    private String optionTitle;
 
-    @Column(name = "select_required_option_values")
-    private  String selectRequiredOptionValues;
-
-    @Column(name = "select_optional_name")
-    private String selectOptionalName;
-
-    @Column(name = "select_optional_values")
-    private String selectOptionalValues;
-
-    @Column(name = "reservation_price")
-    private Long reservation_price;
+    @Column(name = "option_value")
+    private String optionValue;
 
     @Column(name = "quantity")
     private Integer quantity;
+
+    @Column(name = "price")
+    private String price;
+
+    @Column(name = "option_flg")
+    private boolean optionFlg;
 
     @CreatedDate
     @Column(name = "created_at")
@@ -51,11 +50,11 @@ public class Cart { // 관심상품
     private Timestamp updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travel_package_id")
     private TravelPackage travelPackage;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

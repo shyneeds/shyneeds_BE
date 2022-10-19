@@ -139,8 +139,6 @@ public class OauthService {
             User kakaoUser = clientKakao.getUserData(authRequestDto.getAccessToken());
             Long kakaoId = kakaoUser.getKakaoId();
             AuthToken token = null;
-
-
             if (userRepository.findByKakaoId(kakaoId) == null){
                 token = authTokenProvider.createAppToken(kakaoUser.getEmail(), "USER");
                 kakaoUser.builder()
