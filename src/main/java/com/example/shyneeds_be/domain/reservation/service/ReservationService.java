@@ -174,7 +174,7 @@ public class ReservationService {
                     reservationRepository.save(reservation);
                     return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "예약이 취소되었습니다.");
                 } else {
-                    return ApiResponseDto.of(ResponseStatusCode.FORBIDDEN.getValue(), "해당 유저의 예약번호가 아닙니다.");ㄹ
+                    return ApiResponseDto.of(ResponseStatusCode.FORBIDDEN.getValue(), "해당 유저의 예약번호가 아닙니다.");
                 }
             } else {
                 return ApiResponseDto.of(ResponseStatusCode.NO_CONTENT.getValue(), "해당 예약번호의 예약이 없습니다.");
