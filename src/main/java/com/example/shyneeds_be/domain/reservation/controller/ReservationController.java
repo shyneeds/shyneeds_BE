@@ -2,6 +2,7 @@ package com.example.shyneeds_be.domain.reservation.controller;
 
 import com.example.shyneeds_be.domain.reservation.model.dto.request.AddReservationRequestDto;
 import com.example.shyneeds_be.domain.reservation.model.dto.request.CancelReservationRequestDto;
+import com.example.shyneeds_be.domain.reservation.model.dto.response.ReservationCancelInfoResponseDto;
 import com.example.shyneeds_be.domain.reservation.model.dto.response.ReservationDetailResponseDto;
 import com.example.shyneeds_be.domain.reservation.service.ReservationService;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
@@ -31,5 +32,11 @@ public class ReservationController {
     @DeleteMapping("/user/{id}")
     public ApiResponseDto cancelReservation(@PathVariable("id") Long userId, @RequestParam(name = "reservation_number") String reservationNumber, @RequestBody CancelReservationRequestDto cancelReservationRequest){
         return reservationService.cancelReservation(userId, reservationNumber, cancelReservationRequest);
+    }
+
+    @ApiOperation(value = "취소 상세")
+    @GetMapping("/cancel")
+    public ApiResponseDto<ReservationCancelInfoResponseDto> getReservationCancelInfo(@RequestParam(name = "reservation_number") String reservationNumber){
+        return reservationService.getReservationCancelInfo(reservationNumber);
     }
 }

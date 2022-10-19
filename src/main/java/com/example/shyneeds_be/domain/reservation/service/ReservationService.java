@@ -3,10 +3,7 @@ package com.example.shyneeds_be.domain.reservation.service;
 import com.example.shyneeds_be.domain.reservation.model.dto.request.AddReservationRequestDto;
 import com.example.shyneeds_be.domain.reservation.model.dto.request.CancelReservationRequestDto;
 import com.example.shyneeds_be.domain.reservation.model.dto.request.ReservationPackageRequestDto;
-import com.example.shyneeds_be.domain.reservation.model.dto.response.PaymentInfoDto;
-import com.example.shyneeds_be.domain.reservation.model.dto.response.ReservationDetailResponseDto;
-import com.example.shyneeds_be.domain.reservation.model.dto.response.ReservationPackageDetailDto;
-import com.example.shyneeds_be.domain.reservation.model.dto.response.ReservatorInfoDto;
+import com.example.shyneeds_be.domain.reservation.model.dto.response.*;
 import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
 import com.example.shyneeds_be.domain.reservation.model.enums.ReservationStatus;
 import com.example.shyneeds_be.domain.reservation.repository.ReservationRepository;
@@ -186,5 +183,22 @@ public class ReservationService {
 
     }
 
+    public ApiResponseDto<ReservationCancelInfoResponseDto> getReservationCancelInfo(String reservationNumber) {
+        try{
+            if (reservationRepository.findByReservationNumber(reservationNumber) != null){
+                Reservation reservation = reservationRepository.findByReservationNumber(reservationNumber);
+                return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "취소 상세 조회를 성공했습니다",
+                        ReservationCancelInfoResponseDto.builder()
+                                .cancelReason(reservation.getCancelReason())
+                                .cancelReasonDetail(reservation.getCancelReasonDetail())
+                                .paymentMethod(reservation.getPaymentMethod())
+                                .build());
+            } else {
+                return ApiResponseDto.of(ResponseStatusCode.NO_CONTENT.getValue(), "해당 예약번호의 예약이 없습니다.");
+            }
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "취소 상세 조회에 실패했습니다 " + e.getMessage());
+        }
+    }
 }
 
