@@ -50,6 +50,7 @@ public class SecurityConfig {
                 .antMatchers("/api/package/admin/**").hasAnyAuthority("ADMIN")
                 .antMatchers("/api/my/user/**").authenticated()
                 .antMatchers("/api/reservation/**").authenticated()
+                .antMatchers("/api/cart/**").authenticated()
                 .and()
 
                 .addFilterBefore(new JwtAuthenticationFilter(authTokenProvider), UsernamePasswordAuthenticationFilter.class)
