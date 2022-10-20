@@ -145,13 +145,16 @@ public class OauthService {
                         .role("USER")
                         .build();
 
+                RefreshToken refreshToken = RefreshToken.builder()
+                        .refreshToken(token.getToken().getRefreshToken())
+                        .user(kakaoUser)
+                        .build();
+
+                refreshTokenRepository.save(refreshToken);
+
+                kakaoUser.saveRefreshToken(refreshToken);
                 userRepository.save(kakaoUser);
-                refreshTokenRepository.save(
-                        RefreshToken.builder()
-                                .refreshToken(token.getToken().getRefreshToken())
-                                .user(kakaoUser)
-                                .build()
-                );
+
                 return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(),"카카오 로그인에 성공했습니다",AuthResponseDto.builder()
                         .accessToken(token.getToken().getAccessToken())
                         .refreshToken(token.getToken().getRefreshToken())
@@ -161,13 +164,20 @@ public class OauthService {
             } else {
                 token = authTokenProvider.createToken(kakaoUser.getEmail(), userRepository.findByKakaoId(kakaoId).getRole());
                 User user = userRepository.findByKakaoId(kakaoId);
+
+                if (user.getRefreshToken() != null){
+                    refreshTokenRepository.delete(user.getRefreshToken());
+                }
+
+                RefreshToken refreshToken = RefreshToken.builder()
+                        .refreshToken(token.getToken().getRefreshToken())
+                        .user(user)
+                        .build();
+
+                refreshTokenRepository.save(refreshToken);
+
+                user.saveRefreshToken(refreshToken);
                 userRepository.save(user);
-                refreshTokenRepository.save(
-                        RefreshToken.builder()
-                                .refreshToken(token.getToken().getRefreshToken())
-                                .user(user)
-                                .build()
-                );
 
                 return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "카카오 로그인에 성공했습니다", AuthResponseDto.builder()
                         .accessToken(token.getToken().getAccessToken())
