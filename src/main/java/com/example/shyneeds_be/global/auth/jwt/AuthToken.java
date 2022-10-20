@@ -1,12 +1,11 @@
 package com.example.shyneeds_be.global.auth.jwt;
 
 import com.example.shyneeds_be.global.auth.dto.TokenInfoDto;
-import com.example.shyneeds_be.global.network.response.ApiResponseDto;
-import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import io.jsonwebtoken.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 
 import java.security.Key;
 import java.sql.Date;
@@ -17,22 +16,24 @@ import java.sql.Date;
 public class AuthToken {
 
     private final TokenInfoDto token;
+
     private Key key;
 
     private static final String AUTHORITIES_KEY = "auth";
 
-    public AuthToken(String email, String role, Date accessExpiry,Date refreshExpiry, Key key) {
+    public AuthToken(String email, Long userId, String role, Date accessExpiry,Date refreshExpiry, Key key) {
         this.key = key;
-        this.token = createAuthToken(email, role, accessExpiry, refreshExpiry);
+        this.token = createAuthToken(email, userId, role, accessExpiry, refreshExpiry);
     }
 
-    public AuthToken(String email, String role, Date accessExpiry, Key key){
+    public AuthToken(String email, Long userId, String role, Date accessExpiry, Key key){
         this.key = key;
-        this.token = recreateAccessToken(email, role, accessExpiry);
+        this.token = recreateAccessToken(email, userId, role, accessExpiry);
     }
 
-    private TokenInfoDto recreateAccessToken(String email, String role, Date accessExpiry) {
+    private TokenInfoDto recreateAccessToken(String email, Long userId, String role, Date accessExpiry) {
         Claims claims = Jwts.claims().setSubject(email);
+        claims.put("userId", userId);
         claims.put("role", role);
 
         String accessToken = Jwts.builder()
@@ -47,8 +48,9 @@ public class AuthToken {
                 .build();
     }
 
-    private TokenInfoDto createAuthToken(String email, String role, Date accessExpiry, Date refreshExpiry) {
+    private TokenInfoDto createAuthToken(String email, Long userId, String role, Date accessExpiry, Date refreshExpiry) {
         Claims claims = Jwts.claims().setSubject(email);
+        claims.put("userId", userId);
         claims.put("role", role);
 
         String accessToken = Jwts.builder()
@@ -73,9 +75,6 @@ public class AuthToken {
     public boolean validate() {
         return this.getTokenClaims() != null;
     }
-
-
-
 
     public Claims getTokenClaims() {
         try {

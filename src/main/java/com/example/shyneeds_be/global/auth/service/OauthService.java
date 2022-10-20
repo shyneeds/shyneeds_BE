@@ -18,7 +18,6 @@ import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -26,7 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Ref;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -55,15 +53,14 @@ public class OauthService {
     */
     @Transactional
     public ApiResponseDto<AuthResponseDto> login(LoginRequestDto loginRequestDto){
-
         try {
+            User user = getUserIdByEmail(loginRequestDto.getEmail());
+
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword());
 
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-            AuthToken token = authTokenProvider.generateToken(authentication, loginRequestDto.getEmail());
-
-            User user = userRepository.findByEmail(loginRequestDto.getEmail());
+            AuthToken token = authTokenProvider.generateToken(authentication, loginRequestDto.getEmail(), user.getId());
 
             if (user.getRefreshToken() != null){
                 refreshTokenRepository.delete(user.getRefreshToken());
@@ -136,34 +133,44 @@ public class OauthService {
     @Transactional
     public ApiResponseDto<AuthResponseDto> kakaoLogin(AuthRequestDto authRequestDto) {
         try{
+
             User kakaoUser = clientKakao.getUserData(authRequestDto.getAccessToken());
             Long kakaoId = kakaoUser.getKakaoId();
             AuthToken token = null;
             if (userRepository.findByKakaoId(kakaoId) == null){
-                token = authTokenProvider.createAppToken(kakaoUser.getEmail(), "USER");
-                kakaoUser.builder()
+                User user = User.builder()
+                        .kakaoId(kakaoUser.getKakaoId())
+                        .email(kakaoUser.getEmail())
+                        .name(kakaoUser.getName())
+                        .gender(kakaoUser.getGender())
                         .role("USER")
+                        .totalPaymentAmount(0L)
                         .build();
+
+                userRepository.save(user);
+
+                token = authTokenProvider.createAppToken(user.getEmail(), user.getId(), user.getRole());
 
                 RefreshToken refreshToken = RefreshToken.builder()
                         .refreshToken(token.getToken().getRefreshToken())
-                        .user(kakaoUser)
+                        .user(user)
                         .build();
 
                 refreshTokenRepository.save(refreshToken);
+                user.saveRefreshToken(refreshToken);
 
-                kakaoUser.saveRefreshToken(refreshToken);
-                userRepository.save(kakaoUser);
+                userRepository.save(user);
 
                 return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(),"카카오 로그인에 성공했습니다",AuthResponseDto.builder()
                         .accessToken(token.getToken().getAccessToken())
                         .refreshToken(token.getToken().getRefreshToken())
-                        .userId(kakaoUser.getId())
+                        .userId(user.getId())
                         .build());
 
             } else {
-                token = authTokenProvider.createToken(kakaoUser.getEmail(), userRepository.findByKakaoId(kakaoId).getRole());
                 User user = userRepository.findByKakaoId(kakaoId);
+                token = authTokenProvider.createToken(kakaoUser.getEmail(), user.getId() ,user.getRole());
+
 
                 if (user.getRefreshToken() != null){
                     refreshTokenRepository.delete(user.getRefreshToken());
@@ -211,5 +218,9 @@ public class OauthService {
         catch (Exception e){
             return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "refresh token 검증에 실패했습니다." + e.getMessage());
         }
+    }
+
+    public User getUserIdByEmail(String email){
+        return userRepository.findByEmail(email);
     }
 }
