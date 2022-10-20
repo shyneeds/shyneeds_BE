@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 public class AddCartRequestDto {
 
-    List<AddCartPackageRequestDto> addCartPackageRequestList;
+    List<AddCartPackageRequestDto> addCartList;
 
 
 }

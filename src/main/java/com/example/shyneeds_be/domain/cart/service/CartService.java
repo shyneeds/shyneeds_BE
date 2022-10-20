@@ -30,7 +30,7 @@ public class CartService
         try{
             User user = userRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("없는 유저입니다."));
 
-            for (AddCartPackageRequestDto addCartPackageRequest : addCartRequest.getAddCartPackageRequestList()) {
+            for (AddCartPackageRequestDto addCartPackageRequest : addCartRequest.getAddCartList()) {
                 TravelPackage travelPackage = travelPackageRepository.findByPackageId(addCartPackageRequest.getProductId());
 
                 cartRepository.save(
