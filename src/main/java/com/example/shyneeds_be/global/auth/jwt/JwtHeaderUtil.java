@@ -1,7 +1,10 @@
 package com.example.shyneeds_be.global.auth.jwt;
 
+import org.springframework.stereotype.Component;
+
 import javax.servlet.http.HttpServletRequest;
 
+@Component
 public class JwtHeaderUtil {
     private final static String HEADER_AUTHORIZATION = "Authorization";
     private final static String TOKEN_PREFIX = "Bearer ";
