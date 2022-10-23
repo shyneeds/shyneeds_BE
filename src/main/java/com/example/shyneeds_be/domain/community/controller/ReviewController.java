@@ -1,7 +1,9 @@
 package com.example.shyneeds_be.domain.community.controller;
 
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewMainResponseDto;
+import com.example.shyneeds_be.domain.community.model.dto.response.ReviewResponseDto;
 import com.example.shyneeds_be.domain.community.service.ReviewService;
+import com.example.shyneeds_be.domain.user.model.entity.User;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +30,11 @@ public class ReviewController {
     }
 
 
+    @ApiOperation(value = "회원이 작성한 리뷰 리스트 조회")
+    @GetMapping("/mypage")
+    public ApiResponseDto<List<ReviewMainResponseDto>> getMyReviewList(@PageableDefault Pageable pageable){
+        User user = User.builder().id(30L).build();
+        return reviewService.getMyReviewList(user, pageable);
+    }
 
 }

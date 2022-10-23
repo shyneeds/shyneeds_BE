@@ -1,6 +1,7 @@
 package com.example.shyneeds_be.domain.community.service;
 
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewMainResponseDto;
+import com.example.shyneeds_be.domain.community.model.dto.response.ReviewResponseDto;
 import com.example.shyneeds_be.domain.community.model.entity.Review;
 import com.example.shyneeds_be.domain.community.repository.ReviewRepository;
 import com.example.shyneeds_be.domain.user.model.entity.User;
@@ -8,6 +9,7 @@ import com.example.shyneeds_be.domain.user.repository.UserRepository;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.Pagination;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -68,5 +70,21 @@ public class ReviewService {
         }
 
         return sb.toString();
+    }
+
+    // [Mypage] 내가 작성한 리뷰 조회
+    public ApiResponseDto<List<ReviewMainResponseDto>> getMyReviewList(User user, Pageable pageable) {
+        try{
+
+            Page<Review> userReviewList = reviewRepository.findByUserId(user.getId(), pageable);
+
+            Pagination pagination = Pagination.getPagination(userReviewList);
+
+            List<ReviewMainResponseDto> reviewMainResponseDtoList = userReviewList.map(this::response).stream().toList();
+
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", reviewMainResponseDtoList, pagination);
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다. " + e.getMessage());
+        }
     }
 }

@@ -34,4 +34,6 @@ public interface ReviewCommentRepository extends JpaRepository<ReviewComment, Lo
             "ORDER BY updated_at DESC"
             , nativeQuery = true)
     Page<ReviewComment> findByReviewId(@Param("reviewId") Long reviewId, Pageable pageable);
+
+
 }
