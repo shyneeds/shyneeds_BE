@@ -20,6 +20,6 @@ public class RefreshToken {
     @Column(name = "refresh_token", nullable = false)
     private String refreshToken;
 
-    @OneToOne(mappedBy = "refreshToken")
+    @OneToOne(mappedBy = "refreshToken", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private User user;
 }
