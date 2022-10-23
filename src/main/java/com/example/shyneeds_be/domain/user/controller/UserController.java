@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
@@ -19,11 +21,11 @@ public class UserController {
 
     @ApiOperation(value = "유저 정보 수정 기능")
     @Auth
-    @PatchMapping(value=  "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ApiResponseDto updateUserInfo(@PathVariable("id") Long userId,
+    @PatchMapping(value=  "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ApiResponseDto updateUserInfo(HttpServletRequest req,
                                          @RequestPart("updateUserRequest") UpdateUserRequestDto updateUserRequest,
                                          @RequestPart("profileImage") MultipartFile profileImage){
-        return userService.updateUser(userId, updateUserRequest, profileImage);
+        return userService.updateUser((Long)req.getAttribute("userId"), updateUserRequest, profileImage);
     }
 
     @ApiOperation(value = "회원 탈퇴 기능")
