@@ -1,9 +1,7 @@
 package com.example.shyneeds_be.domain.travel_package.service;
 
 import com.example.shyneeds_be.domain.category.model.entity.Category;
-import com.example.shyneeds_be.domain.category.model.entity.SubCategory;
 import com.example.shyneeds_be.domain.category.model.response.CategoryResponseDto;
-import com.example.shyneeds_be.domain.category.model.response.SubCategoryResponseDto;
 import com.example.shyneeds_be.domain.category.repository.CategoryRepository;
 import com.example.shyneeds_be.domain.travel_package.model.dto.request.PackageOptionRequestDto;
 import com.example.shyneeds_be.domain.travel_package.model.dto.request.TravelPackageRegisterRequestDto;
@@ -262,37 +260,56 @@ public class TravelPackageService {
                 .build();
     }
 
+
     private Map<String, List<PackageOptionResponseDto>> responsePackageOptionMap(List<PackageOption> packageOptionList){
-        Map<String, List<PackageOptionResponseDto>> packageOptionMap = new HashMap<>();
 
-        List<PackageOptionResponseDto> packageOptionResponseDtoList = new ArrayList<>();
-
-        // packageOption 순회
-        for (PackageOption packageOption : packageOptionList) {
-            // map의 키에 packageOption 타이틀 (키값)이 없으면 키값으로 사용
-            if(!packageOptionMap.containsKey(packageOption.getTitle())) {
-                // 키 값 변경 시 새로운 리스트로 초기화
-                packageOptionResponseDtoList = new ArrayList<>();
-            }
-
-            PackageOptionResponseDto packageOptionResponseDto = PackageOptionResponseDto.builder()
-                        .id(packageOption.getId())
-                        .title(packageOption.getTitle())
-                        .optionValue(packageOption.getOptionValue())
-                        .price(packageOption.getPrice())
-                        .optionFlg(packageOption.isOptionFlg())
-                        .createdAt(packageOption.getCreatedAt())
-                        .updatedAt(packageOption.getUpdatedAt())
-                        .build();
-
-                packageOptionResponseDtoList.add(packageOptionResponseDto);;
-
-                packageOptionMap.put(packageOption.getTitle(), packageOptionResponseDtoList);
+        Map<String, List<PackageOptionResponseDto>> packageOptionMap =
+                this.addQuotationTitle(packageOptionList).stream().map(this::responsePackageOptionResponseDto).toList().stream().collect(Collectors.groupingBy(PackageOptionResponseDto::getTitle));
 
 
-        }
 
         return packageOptionMap;
+
+    }
+
+    public PackageOptionResponseDto responsePackageOptionResponseDto(PackageOption packageOption){
+       return PackageOptionResponseDto.builder()
+                .id(packageOption.getId())
+                .title(packageOption.getTitle())
+                .optionValue(packageOption.getOptionValue())
+                .price(packageOption.getPrice())
+                .optionFlg(packageOption.isOptionFlg())
+                .createdAt(packageOption.getCreatedAt())
+                .updatedAt(packageOption.getUpdatedAt())
+                .build();
+    }
+
+
+    // 타이틀에 "" 추가 한 패키지 옵션으로 반환
+    private List<PackageOption> addQuotationTitle(List<PackageOption> packageOptionList) {
+
+
+       return  packageOptionList.stream().map(packageOption -> {
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("\'");
+            sb.append(packageOption.getTitle());
+            sb.append("\'");
+            String quotationTitle = sb.toString();
+
+            return PackageOption.builder()
+                    .id(packageOption.getId())
+                    .travelPackage(packageOption.getTravelPackage())
+                    .title(quotationTitle)
+                    .optionValue(packageOption.getOptionValue())
+                    .price(packageOption.getPrice())
+                    .optionFlg(packageOption.isOptionFlg())
+                    .createdAt(packageOption.getCreatedAt())
+                    .updatedAt(packageOption.getUpdatedAt())
+                    .build();
+        }).toList();
+
+
     }
 
     private String removeBracket(List list){

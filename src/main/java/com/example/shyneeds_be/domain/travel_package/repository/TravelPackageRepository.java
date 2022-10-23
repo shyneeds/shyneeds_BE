@@ -101,4 +101,12 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
             "ORDER BY updated_at DESC",
             nativeQuery = true)
     List<TravelPackage> findSearchPackageList(@Param("searchTitle") String searchTitle);
+
+    // [어드민] 상품 리스트 전체 검색
+    // deleted_flg = 0 추가해야함
+    @Query(value = "SELECT * FROM shyneeds.travel_package " +
+            "WHERE deleted_flg = 0 " +
+            "ORDER BY updated_at DESC ",
+    nativeQuery = true)
+    List<TravelPackage> findAll();
 }
