@@ -1,23 +1,31 @@
 package com.example.shyneeds_be.domain.community.service;
 
+import com.example.shyneeds_be.domain.community.model.dto.request.ReviewRegisterRequestDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewMainResponseDto;
-import com.example.shyneeds_be.domain.community.model.dto.response.ReviewResponseDto;
 import com.example.shyneeds_be.domain.community.model.entity.Review;
 import com.example.shyneeds_be.domain.community.repository.ReviewRepository;
+import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
+import com.example.shyneeds_be.domain.reservation.repository.ReservationRepository;
 import com.example.shyneeds_be.domain.user.model.entity.User;
 import com.example.shyneeds_be.domain.user.repository.UserRepository;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.Pagination;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
-import io.swagger.annotations.Api;
+import com.example.shyneeds_be.global.network.s3.ItemS3Uploader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Transactional
 @Service
@@ -26,7 +34,13 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
+    private final ReservationRepository reservationRepository;
 
+    private final ItemS3Uploader itemS3Uploader;
+
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
 
     // 리뷰 리스트 메인 (검색 포함. all 전체 검색)
     public ApiResponseDto<List<ReviewMainResponseDto>> getReviewList(String search, Pageable pageable) {
@@ -40,6 +54,66 @@ public class ReviewService {
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", reviewMainResponseDtoList, pagination);
         } catch (Exception e){
             return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다. " + e.getMessage());
+        }
+    }
+
+
+    // 리뷰 등록
+    public ApiResponseDto register(User user, ReviewRegisterRequestDto reviewRegisterRequestDto) {
+        try{
+
+
+            // 해당 유저의 예약확정 된 예약인지 확인
+            Long userId = user.getId();
+            Long reservationId = reviewRegisterRequestDto.getReservationId();
+
+            Optional<Reservation> optionalReservation = reservationRepository.findByUserIdAndReservationId(userId, reservationId);
+
+            if(optionalReservation.isEmpty()){
+                return ApiResponseDto.of(ResponseStatusCode.UNAUTHORIZED.getValue(), "예약 정보가 일치하지 않은 회원이거나 예약상태 확인이 필요합니다.");
+            }
+
+            // 미구현
+            // 이미지 삭제 : 변경된 이미지 리스트로 S3에서 삭제한다.
+            // 이미지 이름 가져오기
+            // S3에서 이미지 삭제
+
+
+            Review newReview = Review.builder()
+                    .title(reviewRegisterRequestDto.getTitle())
+                    .mainImage(reviewRegisterRequestDto.getMainImage())
+                    .userId(userId)
+                    .contents(reviewRegisterRequestDto.getContents())
+                    .reservationId(reservationId)
+                    .dispFlg(true)
+                    .deletedFlg(false)
+                    .createdAt(Timestamp.valueOf(LocalDateTime.now()))
+                    .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                    .build();
+
+            reviewRepository.save(newReview);
+
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "리뷰 등록에 성공했습니다.");
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "리뷰 등록에 실패했습니다. " + e.getMessage());
+        }
+    }
+
+    // 이미지 파일 업로드 (S3) -> url 반환
+    public String saveImage(MultipartFile upload) {
+        try{
+            if(upload == null){
+                return null;
+            }
+
+            String bucketName = bucket + "/review/upload";
+            return itemS3Uploader.uploadLocal(upload, bucketName);
+
+
+        } catch (Exception e){
+
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -87,4 +161,5 @@ public class ReviewService {
             return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다. " + e.getMessage());
         }
     }
+
 }

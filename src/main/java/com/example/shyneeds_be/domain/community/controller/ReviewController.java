@@ -1,5 +1,6 @@
 package com.example.shyneeds_be.domain.community.controller;
 
+import com.example.shyneeds_be.domain.community.model.dto.request.ReviewRegisterRequestDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewMainResponseDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewResponseDto;
 import com.example.shyneeds_be.domain.community.service.ReviewService;
@@ -10,13 +11,17 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/review")
@@ -30,6 +35,25 @@ public class ReviewController {
     public ApiResponseDto<List<ReviewMainResponseDto>> getReviewList(@PathParam("search") String search, @PageableDefault(value = 12)Pageable pageable){
         return reviewService.getReviewList(search, pageable);
     }
+
+
+    @Auth
+    @ApiOperation(value = "리뷰 저장")
+    @PostMapping("/register")
+    public ApiResponseDto registerReview(HttpServletRequest request, @RequestBody ReviewRegisterRequestDto reviewRegisterRequestDto) {
+        User user = User.builder().id((Long) request.getAttribute("userId")).build();
+        return reviewService.register(user, reviewRegisterRequestDto);
+    }
+
+    @ApiOperation(value = "리뷰 이미지 저장 (단일 파일 -> url 리턴)")
+    @PostMapping(value = "/image/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String image(@RequestPart("upload") MultipartFile upload) throws Exception {
+
+        return reviewService.saveImage(upload);
+    }
+
+
+
 
 
     @Auth
