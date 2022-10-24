@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
@@ -31,4 +32,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "ORDER BY updated_at DESC"
             , nativeQuery = true)
     Page<Review> findByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    // 리뷰 상세조회
+    @Query(value = "SELECT * FROM shyneeds.review " +
+            "WHERE id = :reviewId " +
+            "AND deleted_flg = 0 "
+    ,nativeQuery = true)
+    Optional<Review> findById(@Param("reviewId") Long reviewId);
+
 }
