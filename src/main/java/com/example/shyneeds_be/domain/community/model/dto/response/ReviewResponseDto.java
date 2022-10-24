@@ -37,7 +37,7 @@ public class ReviewResponseDto {
     private String contents;
 
     @ApiModelProperty(name = "다녀온 상품 정보", required = false,  example = "")
-    private VisitPackage visitPackageResponseDto;
+    private VisitPackageResponseDto visitPackageResponseDto;
 
     // 댓글은 따로 호출한다.
 }

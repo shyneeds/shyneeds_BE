@@ -2,10 +2,14 @@ package com.example.shyneeds_be.domain.community.service;
 
 import com.example.shyneeds_be.domain.community.model.dto.request.ReviewRegisterRequestDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewMainResponseDto;
+import com.example.shyneeds_be.domain.community.model.dto.response.ReviewResponseDto;
+import com.example.shyneeds_be.domain.community.model.dto.response.VisitPackageResponseDto;
 import com.example.shyneeds_be.domain.community.model.entity.Review;
+import com.example.shyneeds_be.domain.community.model.entity.VisitPackage;
 import com.example.shyneeds_be.domain.community.repository.ReviewRepository;
 import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
 import com.example.shyneeds_be.domain.reservation.repository.ReservationRepository;
+import com.example.shyneeds_be.domain.travel_package.repository.TravelPackageRepository;
 import com.example.shyneeds_be.domain.user.model.entity.User;
 import com.example.shyneeds_be.domain.user.repository.UserRepository;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
@@ -35,6 +39,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
+    private final TravelPackageRepository travelPackageRepository;
 
     private final ItemS3Uploader itemS3Uploader;
 
@@ -162,4 +167,62 @@ public class ReviewService {
         }
     }
 
+    // 리뷰 상세 조회
+    public ApiResponseDto<ReviewResponseDto> getReview(Long reviewId) {
+        try{
+            Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NoSuchElementException("해당 리뷰를 찾을 수 없습니다."));
+
+
+            // 조회수 증가
+            Review increaseLookupReview = review.increaseLookup();
+
+            Review detailsReview = reviewRepository.save(increaseLookupReview);
+
+            ReviewResponseDto reviewResponseDto = this.responseDetails(detailsReview);
+
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", reviewResponseDto);
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다. " + e.getMessage());
+        }
+    }
+
+    // 리뷰 상세 보기 응답
+    private ReviewResponseDto responseDetails(Review review) {
+
+        String author = "탈퇴회원";
+        Optional<User> optionalUser = userRepository.findById(review.getUserId());
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+
+            author = this.getMaskingAuthor(user.getName());
+        }
+
+
+        VisitPackageResponseDto visitPackageResponseDto = null;
+        Optional<VisitPackage> optionalVisitPackage = travelPackageRepository.findVisitPackage(review.getId());
+        if(optionalVisitPackage.isPresent()){
+            VisitPackage visitPackage = optionalVisitPackage.get();
+
+            String mainImage = "https://shyneeds.s3.ap-northeast-2.amazonaws.com/package/"+
+                    visitPackage.getTitle()+"/main/"+visitPackage.getMainImage();
+
+             visitPackageResponseDto  = VisitPackageResponseDto.builder()
+                     .id(visitPackage.getId())
+                     .mainImage(mainImage)
+                     .title(visitPackage.getTitle())
+                     .build();
+        }
+
+
+        return ReviewResponseDto.builder()
+                .id(review.getId())
+                .title(review.getTitle())
+                .updatedAt(review.getUpdatedAt())
+                .author(author)
+                .lookupCount(review.getLookupCount())
+//                .likeCount(review.getLikeCount())
+                .contents(review.getContents())
+                .visitPackageResponseDto(visitPackageResponseDto)
+                .build();
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.shyneeds_be.domain.travel_package.repository;
 
+import com.example.shyneeds_be.domain.community.model.entity.VisitPackage;
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.TravelPackage;
 import com.example.shyneeds_be.global.model.dto.response.MainTravelPackage;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -103,10 +104,18 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
     List<TravelPackage> findSearchPackageList(@Param("searchTitle") String searchTitle);
 
     // [어드민] 상품 리스트 전체 검색
-    // deleted_flg = 0 추가해야함
     @Query(value = "SELECT * FROM shyneeds.travel_package " +
             "WHERE deleted_flg = 0 " +
             "ORDER BY updated_at DESC ",
     nativeQuery = true)
     List<TravelPackage> findAll();
+
+    // [리뷰] 다녀온 상품의 상품 정보 검색 쿼리
+    @Query(value = "SELECT id, main_image AS mainImage, title FROM shyneeds.travel_package " +
+            "WHERE id = (SELECT travel_package_id FROM shyneeds.reservation_package WHERE " +
+            "reservation_id = (SELECT reservation_id FROM shyneeds.review WHERE id = :reviewId) " +
+            "LIMIT 1" +
+            ")"
+    , nativeQuery = true)
+    Optional<VisitPackage> findVisitPackage(@Param("reviewId") Long reviewId);
 }

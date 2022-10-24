@@ -8,6 +8,7 @@ import com.example.shyneeds_be.domain.user.model.entity.User;
 import com.example.shyneeds_be.global.auth.jwt.Auth;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -32,7 +33,7 @@ public class ReviewController {
 
     @ApiOperation(value = "리뷰 리스트", notes = "[검색] search  = all or title")
     @GetMapping("")
-    public ApiResponseDto<List<ReviewMainResponseDto>> getReviewList(@PathParam("search") String search, @PageableDefault(value = 12)Pageable pageable){
+    public ApiResponseDto<List<ReviewMainResponseDto>> getReviewList(@PathParam("search") String search, @PageableDefault(value = 12) Pageable pageable) {
         return reviewService.getReviewList(search, pageable);
     }
 
@@ -53,13 +54,18 @@ public class ReviewController {
     }
 
 
-
+    @ApiOperation(value = "리뷰 상세 조회")
+    @GetMapping("/{id}/details")
+    public ApiResponseDto<ReviewResponseDto> getReview(@PathVariable("id") Long reviewId){
+        return reviewService.getReview(reviewId);
+    }
 
 
     @Auth
     @ApiOperation(value = "회원이 작성한 리뷰 리스트 조회")
     @GetMapping("/mypage")
-    public ApiResponseDto<List<ReviewMainResponseDto>> getMyReviewList(HttpServletRequest request, @PageableDefault Pageable pageable){
+
+    public ApiResponseDto<List<ReviewMainResponseDto>> getMyReviewList(HttpServletRequest request, @PageableDefault Pageable pageable) {
         Long userId = (Long) request.getAttribute("userId");
         User user = User.builder()
                 .id(userId)
