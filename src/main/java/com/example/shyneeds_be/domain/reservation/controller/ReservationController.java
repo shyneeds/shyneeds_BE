@@ -5,10 +5,13 @@ import com.example.shyneeds_be.domain.reservation.model.dto.request.CancelReserv
 import com.example.shyneeds_be.domain.reservation.model.dto.response.ReservationCancelInfoResponseDto;
 import com.example.shyneeds_be.domain.reservation.model.dto.response.ReservationDetailResponseDto;
 import com.example.shyneeds_be.domain.reservation.service.ReservationService;
+import com.example.shyneeds_be.global.auth.jwt.Auth;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,9 +20,10 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @ApiOperation(value = "[유저] 상품 예약")
-    @PostMapping("/user/{id}")
-    public ApiResponseDto addReservation(@PathVariable("id") Long userId, @RequestBody AddReservationRequestDto addReservationRequest){
-        return reservationService.addReservation(userId, addReservationRequest);
+    @Auth
+    @PostMapping("/user")
+    public ApiResponseDto addReservation(HttpServletRequest req, @RequestBody AddReservationRequestDto addReservationRequest){
+        return reservationService.addReservation((Long)req.getAttribute("userId"), addReservationRequest);
     }
 
     @ApiOperation(value = "예약정보 조회")
@@ -29,9 +33,10 @@ public class ReservationController {
     }
 
     @ApiOperation(value = "예약 취소")
-    @DeleteMapping("/user/{id}")
-    public ApiResponseDto cancelReservation(@PathVariable("id") Long userId, @RequestParam(name = "reservation_number") String reservationNumber, @RequestBody CancelReservationRequestDto cancelReservationRequest){
-        return reservationService.cancelReservation(userId, reservationNumber, cancelReservationRequest);
+    @Auth
+    @DeleteMapping("/user")
+    public ApiResponseDto cancelReservation(HttpServletRequest req, @RequestParam(name = "reservation_number") String reservationNumber, @RequestBody CancelReservationRequestDto cancelReservationRequest){
+        return reservationService.cancelReservation((Long)req.getAttribute("userId"), reservationNumber, cancelReservationRequest);
     }
 
     @ApiOperation(value = "취소 상세")

@@ -29,9 +29,9 @@ public class UserController {
     }
 
     @ApiOperation(value = "회원 탈퇴 기능")
-    @DeleteMapping("/{id}")
-    public ApiResponseDto deleteUser(@PathVariable("id") Long userId){
-        return userService.deleteUser(userId);
+    @Auth
+    @DeleteMapping("")
+    public ApiResponseDto deleteUser(HttpServletRequest req){
+        return userService.deleteUser((Long)req.getAttribute("userId"));
     }
-
 }
