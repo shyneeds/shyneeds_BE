@@ -34,6 +34,7 @@ public class UserService {
     @Transactional
     public ApiResponseDto updateUser(Long id, UpdateUserRequestDto updateUserRequest, MultipartFile profileImage) {
         try{
+
             User user = findUserById(id);
 
             String strBirthday = updateUserRequest.getYear() + "-" + updateUserRequest.getMonth() + "-" + updateUserRequest.getDay();
