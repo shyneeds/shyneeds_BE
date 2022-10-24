@@ -13,8 +13,9 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authInterceptor);
+        registry.addInterceptor(authInterceptor)
 //                .addPathPatterns("/*") // 해당 경로에 접근하기 전에 인터셉터가 가로챈다.
 //                .excludePathPatterns("/"); // 해당 경로는 인터셉터가 가로채지 않는다.;
+        .excludePathPatterns("/swagger-ui/*");
     }
 }
