@@ -43,9 +43,6 @@ public class Review {
     @Column(name = "lookup_count")
     private int lookupCount;
 
-    @Column(name = "like_count")
-    private int likeCount;
-
     @Column(name = "disp_flg")
     private boolean dispFlg;
 
@@ -66,4 +63,6 @@ public class Review {
 
         return this;
     }
+
+
 }

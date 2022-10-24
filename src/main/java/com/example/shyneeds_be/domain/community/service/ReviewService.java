@@ -5,7 +5,10 @@ import com.example.shyneeds_be.domain.community.model.dto.response.ReviewMainRes
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewResponseDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.VisitPackageResponseDto;
 import com.example.shyneeds_be.domain.community.model.entity.Review;
+import com.example.shyneeds_be.domain.community.model.entity.ReviewLike;
+import com.example.shyneeds_be.domain.community.model.entity.ReviewLikeCount;
 import com.example.shyneeds_be.domain.community.model.entity.VisitPackage;
+import com.example.shyneeds_be.domain.community.repository.ReviewLikeRepository;
 import com.example.shyneeds_be.domain.community.repository.ReviewRepository;
 import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
 import com.example.shyneeds_be.domain.reservation.repository.ReservationRepository;
@@ -40,6 +43,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
     private final TravelPackageRepository travelPackageRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     private final ItemS3Uploader itemS3Uploader;
 
@@ -186,6 +190,7 @@ public class ReviewService {
         }
     }
 
+
     // 리뷰 상세 보기 응답
     private ReviewResponseDto responseDetails(Review review) {
 
@@ -220,9 +225,23 @@ public class ReviewService {
                 .updatedAt(review.getUpdatedAt())
                 .author(author)
                 .lookupCount(review.getLookupCount())
-//                .likeCount(review.getLikeCount())
+                .likeCount(this.getLikeCount(review.getId()))
                 .contents(review.getContents())
                 .visitPackageResponseDto(visitPackageResponseDto)
                 .build();
+    }
+
+    // 리뷰의 좋아요 개수
+    private int getLikeCount(Long reviewId){
+
+        // 해당 리뷰에 로그인 유저의 좋아요 카운팅 후 짝수면 좋아요 증가, 짝수면 좋아요 감소
+        List<ReviewLikeCount> reviewLikeList = reviewLikeRepository.findByReviewLike(reviewId);
+        int reviewLikeCount = 0;
+
+        for (ReviewLikeCount r : reviewLikeList) {
+            reviewLikeCount += r.getCnt();
+        }
+
+        return reviewLikeCount;
     }
 }
