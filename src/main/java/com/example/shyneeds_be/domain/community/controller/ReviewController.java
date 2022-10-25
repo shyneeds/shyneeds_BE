@@ -1,6 +1,7 @@
 package com.example.shyneeds_be.domain.community.controller;
 
 import com.example.shyneeds_be.domain.community.model.dto.request.ReviewRegisterRequestDto;
+import com.example.shyneeds_be.domain.community.model.dto.request.ReviewUpdateRequestDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewMainResponseDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewResponseDto;
 import com.example.shyneeds_be.domain.community.service.ReviewService;
@@ -59,6 +60,24 @@ public class ReviewController {
     public ApiResponseDto<ReviewResponseDto> getReview(@PathVariable("id") Long reviewId){
         return reviewService.getReview(reviewId);
     }
+
+
+    @Auth
+    @ApiOperation(value = "리뷰 수정")
+    @PutMapping("/update")
+    public ApiResponseDto updateReview(HttpServletRequest request, @RequestBody ReviewUpdateRequestDto reviewUpdateRequestDto) {
+        User user = User.builder().id((Long) request.getAttribute("userId")).build();
+        return reviewService.updateReview(user, reviewUpdateRequestDto);
+    }
+
+    @Auth
+    @ApiOperation(value = "리뷰 삭제")
+    @DeleteMapping("/{id}")
+    public ApiResponseDto deleteReview(HttpServletRequest request, @PathVariable("id") Long reviewId) {
+        User user = User.builder().id((Long) request.getAttribute("userId")).build();
+        return reviewService.deleteReview(user, reviewId);
+    }
+
 
 
     @Auth

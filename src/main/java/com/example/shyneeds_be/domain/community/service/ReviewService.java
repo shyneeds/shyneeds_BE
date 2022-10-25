@@ -1,6 +1,7 @@
 package com.example.shyneeds_be.domain.community.service;
 
 import com.example.shyneeds_be.domain.community.model.dto.request.ReviewRegisterRequestDto;
+import com.example.shyneeds_be.domain.community.model.dto.request.ReviewUpdateRequestDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewMainResponseDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewResponseDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.VisitPackageResponseDto;
@@ -29,10 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Transactional
 @Service
@@ -80,6 +78,12 @@ public class ReviewService {
 
             if(optionalReservation.isEmpty()){
                 return ApiResponseDto.of(ResponseStatusCode.UNAUTHORIZED.getValue(), "예약 정보가 일치하지 않은 회원이거나 예약상태 확인이 필요합니다.");
+            }
+
+            // 방어로직. 동일한 예약건에 대해 한 번만 리뷰 등록 가능
+            Optional<Review> optionalReview = reviewRepository.findByReservationId(reservationId);
+            if(optionalReview.isPresent()){
+                return ApiResponseDto.of(ResponseStatusCode.BAD_REQUEST.getValue(), "이미 작성된 예약 번호 입니다.");
             }
 
             // 미구현
@@ -243,5 +247,55 @@ public class ReviewService {
         }
 
         return reviewLikeCount;
+    }
+
+    // 리뷰 수정
+    public ApiResponseDto updateReview(User user, ReviewUpdateRequestDto reviewUpdateRequestDto) {
+        try{
+
+            Long userId = user.getId();
+            Long reviewId = reviewUpdateRequestDto.getId();
+
+            userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("해당 유저 정보를 찾을 수 없습니다."));
+            Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NoSuchElementException("리뷰 정보를 찾을 수 없습니다."));
+
+            if (review.getUserId() != user.getId()) {
+                return ApiResponseDto.of(ResponseStatusCode.UNAUTHORIZED.getValue(), "삭제 권한이 없습니다.");
+            }
+
+            Review updatedReview = review.update(
+                    reviewUpdateRequestDto.getTitle(),
+                    reviewUpdateRequestDto.getMainImage(),
+                    reviewUpdateRequestDto.getContents()
+            );
+
+
+            reviewRepository.save(updatedReview);
+
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "수정에 성공했습니다.");
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "수정에 실패했습니다. " + e.getMessage());
+        }
+    }
+
+    // 리뷰 삭제
+    public ApiResponseDto deleteReview(User user, Long reviewId) {
+        try{
+
+            userRepository.findById(user.getId()).orElseThrow(() -> new NoSuchElementException("해당 유저 정보를 찾을 수 없습니다."));
+            Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NoSuchElementException("리뷰 정보를 찾을 수 없습니다."));
+
+            if (review.getUserId() != user.getId()) {
+                return ApiResponseDto.of(ResponseStatusCode.UNAUTHORIZED.getValue(), "삭제 권한이 없습니다.");
+            }
+
+            Review deleteReview = review.delete();
+
+            reviewRepository.save(deleteReview);
+
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "삭제에 성공했습니다.");
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "삭제에 실패했습니다. " + e.getMessage());
+        }
     }
 }

@@ -40,4 +40,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     ,nativeQuery = true)
     Optional<Review> findById(@Param("reviewId") Long reviewId);
 
+
+    // 예약 고유번호로 리뷰 찾기 - 방어로직. 동일 예약 건에 대해 한 번만 리뷰작성 가능
+    @Query(value = "SELECT * FROM shyneeds.review " +
+            "WHERE reservation_id = :reservationId " +
+            "AND deleted_flg = 0"
+    ,nativeQuery = true)
+    Optional<Review> findByReservationId(@Param("reservationId") Long reservationId);
+
 }

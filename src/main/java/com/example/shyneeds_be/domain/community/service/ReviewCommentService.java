@@ -138,7 +138,7 @@ public class ReviewCommentService {
         }
 
         return ReviewCommentResponseDto.builder()
-                .reviewId(reviewComment.getId())
+                .reviewId(reviewComment.getReviewId())
                 .userId(userId)
                 .userName(userName)
                 .comment(reviewComment.getComment())
