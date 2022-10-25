@@ -14,6 +14,9 @@ import java.sql.Timestamp;
 @Builder
 public class ReviewCommentResponseDto {
 
+    @ApiModelProperty(value = "댓글 고유번호", required = true, example = "")
+    private Long id;
+
     @ApiModelProperty(value = "회원 고유번호", required = true, example = "")
     private Long userId;
 
