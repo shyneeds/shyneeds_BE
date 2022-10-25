@@ -73,6 +73,7 @@ public class MainService {
                 .id(travelPackage.getId())
                 .title(travelPackage.getTitle())
                 .imageUrl(imageDir)
+                .price(travelPackage.getPrice())
                 .keyword(travelPackage.getSearchKeyword())
                 .build();
     }

@@ -20,6 +20,9 @@ public class MainBannerResponseDto {
     @ApiModelProperty(value = "이미지 url", required = false, example = "")
     private String imageUrl; // Main
 
+    @ApiModelProperty(value = "가격", required = false, example = "")
+    private String price;
+
     @ApiModelProperty(value = "검색키워드", required = false, example = "")
     private String keyword;
 }
