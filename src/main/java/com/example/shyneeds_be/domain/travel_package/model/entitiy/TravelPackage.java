@@ -1,14 +1,19 @@
 package com.example.shyneeds_be.domain.travel_package.model.entitiy;
 
+import com.example.shyneeds_be.domain.cart.model.entity.Cart;
+import com.example.shyneeds_be.domain.reservation_package.model.entity.ReservationPackage;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "travel_package")
@@ -17,6 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class TravelPackage {
 
     @Id
@@ -47,20 +53,8 @@ public class TravelPackage {
     @Column(name = "summary")
     private String summary;
 
-    @Column(name = "required_option_name")
-    private String requiredOptionName;
-
-    @Column(name = "required_option_values")
-    private String requiredOptionValues;
-
-    @Column(name = "optional_name")
-    private String optionalName;
-
-    @Column(name = "optional_values")
-    private String optionalValues;
-
-    @Column(name = "flight_info")
-    private String flightInfo;
+    @OneToMany(mappedBy = "travelPackage", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<PackageOption> packageOptionList;
 
     @Column(name = "soldout_flg")
     private boolean soldoutFlg;
@@ -78,5 +72,25 @@ public class TravelPackage {
 
     @Column(name = "search_keyword")
     private String searchKeyword;
+
+    @Column(name = "deleted_flg")
+    private boolean deletedFlg;
+
+    @Column(name = "main_banner_flg")
+    private boolean mainBannerFlg;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "travelPackage", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ReservationPackage> reservationPackages = new ArrayList<>();
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "travelPackage", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Cart> carts = new ArrayList<>();
+
+    // 상품 삭제
+    public TravelPackage deleted(){
+        this.deletedFlg = true;
+        return this;
+    }
 
 }

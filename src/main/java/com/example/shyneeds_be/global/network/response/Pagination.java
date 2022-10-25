@@ -22,7 +22,7 @@ public class Pagination {
                 .totalPages(entityList.getTotalPages())
                 .totalElements(entityList.getTotalElements())
                 .currentElements(entityList.getNumberOfElements())
-                .currentPage(entityList.getNumber())
+                .currentPage(entityList.getNumber()+1)
                 .build();
     }
 

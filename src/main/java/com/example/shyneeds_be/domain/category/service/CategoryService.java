@@ -13,17 +13,20 @@ import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final SubCategoryRepository subCategoryRepository;
     private final ThirdCategoryRepository thirdCategoryRepository;
 
+    // 카테고리 리스트 조회
     public ApiResponseDto<List<CategoryResponseDto>> getCategoryList(){
         try{
 
@@ -34,16 +37,32 @@ public class CategoryService {
         }
     }
 
+
+    // 메인 카테고리로 서브 카테고리 조회
+    public ApiResponseDto<List<SubCategoryResponseDto>> getSubCategory(Long categoryId) {
+        try{
+
+            List<SubCategoryResponseDto> subCategoryResponseDtoList = subCategoryRepository.findByCategoryId(categoryId).stream().map(this::responseSubCategory).toList();
+
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", subCategoryResponseDtoList);
+
+        } catch(Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다." + e.getMessage());
+        }
+    }
+
     private CategoryResponseDto response(Category category){
 
         // 서브 카테고리
         List<SubCategoryResponseDto> subCategoryResponseDtoList = new ArrayList<>();
 
-        StringTokenizer st = new StringTokenizer(category.getSubCategoryIds(), ",");
-        while(st.hasMoreElements()){
-            Optional<SubCategory> optionalSubCategory = subCategoryRepository.findById(Long.valueOf(st.nextToken()));
-            if(optionalSubCategory.isPresent()){
-                subCategoryResponseDtoList.add(responseSubCategory(optionalSubCategory.get()));
+        if(category.getSubCategoryIds() != null) {
+            StringTokenizer st = new StringTokenizer(category.getSubCategoryIds(), ",");
+            while (st.hasMoreElements()) {
+                Optional<SubCategory> optionalSubCategory = subCategoryRepository.findById(Long.valueOf(st.nextToken()));
+                if (optionalSubCategory.isPresent()) {
+                    subCategoryResponseDtoList.add(responseSubCategory(optionalSubCategory.get()));
+                }
             }
         }
        return CategoryResponseDto.builder()
@@ -92,4 +111,6 @@ public class CategoryService {
                 .updatedAt(thirdCategory.getUpdatedAt())
                 .build();
     }
+
+
 }
