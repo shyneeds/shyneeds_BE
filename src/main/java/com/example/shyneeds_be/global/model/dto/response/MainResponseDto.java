@@ -1,5 +1,6 @@
 package com.example.shyneeds_be.global.model.dto.response;
 
+import com.example.shyneeds_be.domain.community.model.dto.response.BestReviewResponseDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,5 +27,5 @@ public class MainResponseDto {
 
 
     @ApiModelProperty(value = "후기", required = false, example = "")
-    private List<String> bestReviewList;
+    private List<BestReviewResponseDto> bestReviewList;
 }
