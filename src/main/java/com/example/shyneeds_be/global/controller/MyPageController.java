@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/my/user")
@@ -16,9 +18,9 @@ public class MyPageController {
 
     private final MyPageService myPageService;
 
-    @GetMapping("/{id}")
-    public ApiResponseDto<MyPageResponseDto> getMyPageMain(@PathVariable("id") Long id){
-        return myPageService.getMyPageMain(id);
+    @GetMapping("")
+    public ApiResponseDto<MyPageResponseDto> getMyPageMain(HttpServletRequest req){
+        return myPageService.getMyPageMain((Long) req.getAttribute("userId"));
     }
 
 }

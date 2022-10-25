@@ -3,10 +3,13 @@ package com.example.shyneeds_be.global.controller;
 import com.example.shyneeds_be.global.auth.dto.*;
 import com.example.shyneeds_be.global.auth.dto.request.ValidateRefreshRequestDto;
 import com.example.shyneeds_be.global.auth.dto.response.RecreatedAccessTokenResponseDto;
+import com.example.shyneeds_be.global.auth.jwt.Auth;
 import com.example.shyneeds_be.global.auth.service.OauthService;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,8 +30,9 @@ public class AuthController {
         return oauthService.kakaoLogin(authAccessToken);
     }
 
-    @PostMapping("/refresh/{id}")
-    public ApiResponseDto<RecreatedAccessTokenResponseDto> validateRefreshToken(@PathVariable(name = "id") Long userId, @RequestHeader("REFRESH_TOKEN") ValidateRefreshRequestDto validateRefreshRequest){
-        return oauthService.validateRefreshToken(userId, validateRefreshRequest);
+    @Auth
+    @PostMapping("/refresh")
+    public ApiResponseDto<RecreatedAccessTokenResponseDto> validateRefreshToken(HttpServletRequest req, @RequestHeader("REFRESH_TOKEN") ValidateRefreshRequestDto validateRefreshRequest){
+        return oauthService.validateRefreshToken((Long) req.getAttribute("userId"), validateRefreshRequest);
     }
 }
