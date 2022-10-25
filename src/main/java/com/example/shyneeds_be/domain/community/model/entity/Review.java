@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Table(name = "Review")
 @Entity
@@ -43,9 +44,6 @@ public class Review {
     @Column(name = "lookup_count")
     private int lookupCount;
 
-    @Column(name = "like_count")
-    private int likeCount;
-
     @Column(name = "disp_flg")
     private boolean dispFlg;
 
@@ -59,4 +57,31 @@ public class Review {
     @LastModifiedDate
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    // 조회수 증가
+    public Review increaseLookup(){
+        this.lookupCount++;
+
+        return this;
+    }
+
+    // 수정
+    public Review update(String title, String mainImage, String contents){
+        this.title = title;
+        this.mainImage = mainImage;
+        this.contents = contents;
+        this.updatedAt = Timestamp.valueOf(LocalDateTime.now());
+
+        return this;
+    }
+
+    // 삭제 처리
+    public Review delete(){
+        this.deletedFlg = true;
+        this.updatedAt = Timestamp.valueOf(LocalDateTime.now());
+
+        return this;
+    }
+
+
 }

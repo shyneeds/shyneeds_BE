@@ -1,5 +1,8 @@
 package com.example.shyneeds_be.global.service;
 
+import com.example.shyneeds_be.domain.category.model.entity.CategoryTitle;
+import com.example.shyneeds_be.domain.category.model.response.CategoryTitleResponseDto;
+import com.example.shyneeds_be.domain.category.repository.CategoryRepository;
 import com.example.shyneeds_be.domain.travel_package.model.dto.response.TravelPackageResponseDto;
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.TravelPackage;
 import com.example.shyneeds_be.domain.travel_package.repository.TravelPackageRepository;
@@ -18,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -25,6 +29,8 @@ public class MainService {
 
 
     private final TravelPackageRepository travelPackageRepository;
+
+    private final CategoryRepository categoryRepository;
 
     /*
     메인 화면
@@ -73,6 +79,7 @@ public class MainService {
                 .id(travelPackage.getId())
                 .title(travelPackage.getTitle())
                 .imageUrl(imageDir)
+                .price(travelPackage.getPrice())
                 .keyword(travelPackage.getSearchKeyword())
                 .build();
     }
@@ -132,5 +139,24 @@ public class MainService {
             return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다." + e.getMessage());
 
         }
+    }
+
+    public ApiResponseDto<Map<String, List<CategoryTitleResponseDto>>> getCategoryTitleList() {
+        try{
+
+            Map<String, List<CategoryTitleResponseDto>> categoryTitleResponseDtoMap = categoryRepository.getCategoryTitleList().stream().map(this::responseCategoryTitle).toList()
+                    .stream().collect(Collectors.groupingBy(CategoryTitleResponseDto::getTitle));
+
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "카테고리 타이틀 조회에 성공했습니다.", categoryTitleResponseDtoMap);
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "카테고리 타이틀 조회에 실패했습니다. " + e.getMessage());
+        }
+    }
+
+    private CategoryTitleResponseDto responseCategoryTitle(CategoryTitle categoryTitle) {
+        return CategoryTitleResponseDto.builder()
+                .title(categoryTitle.getTitle())
+                .subCategoryTitle(categoryTitle.getSubCategoryTitle())
+                .build();
     }
 }

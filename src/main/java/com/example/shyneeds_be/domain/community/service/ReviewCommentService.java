@@ -62,18 +62,23 @@ public class ReviewCommentService {
             List<ReviewCommentResponseDto> reviewCommentResponseDtoList = commentList.map(this::response).stream().toList();
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", reviewCommentResponseDtoList, pagination);
         } catch (Exception e){
-            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 싪패했습니다. " + e.getMessage());
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다. " + e.getMessage());
         }
     }
 
     // 댓글 불러오기
     public ApiResponseDto<ReviewCommentResponseDto> getComment(User user, Long commentId) {
         try{
-            ReviewComment comment = reviewCommentRepository.findByUserIdAndCommentId(user.getId(), commentId).orElseThrow(() -> new NoSuchElementException("해당 댓글을 찾을 수 없습니다."));
+
+            ReviewComment comment = reviewCommentRepository.findById(commentId).orElseThrow(() -> new NoSuchElementException("해당 댓글을 찾을 수 없습니다."));
+
+            if(comment.getUserId() != user.getId()){
+                return ApiResponseDto.of(ResponseStatusCode.UNAUTHORIZED.getValue(), "조회 권한이 없습니다.");
+            }
             ReviewCommentResponseDto reviewCommentResponseDto = this.response(comment);
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", reviewCommentResponseDto);
         } catch (Exception e){
-            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 싪패했습니다. " + e.getMessage());
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "조회에 실패했습니다. " + e.getMessage());
         }
     }
 
@@ -86,7 +91,7 @@ public class ReviewCommentService {
             String comment = reviewCommentUpdateRequestDto.getComment();
 
             if(userId != reviewCommentRepository.findById(commentId).get().getUserId()){
-                return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "수정 권한이 없습니다.");
+                return ApiResponseDto.of(ResponseStatusCode.UNAUTHORIZED.getValue(), "수정 권한이 없습니다.");
             }
 
             ReviewComment reviewComment = reviewCommentRepository.findByUserIdAndCommentId(userId, commentId).orElseThrow(() -> new NoSuchElementException("댓글을 찾을 수 없습니다."));
@@ -107,6 +112,9 @@ public class ReviewCommentService {
 
             ReviewComment reviewComment = reviewCommentRepository.findById(commentId).orElseThrow(() -> new NoSuchElementException("댓글을 찾을 수 없습니다."));
 
+            if(reviewComment.getUserId() != user.getId()){
+                return ApiResponseDto.of(ResponseStatusCode.UNAUTHORIZED.getValue(), "댓글 삭제 권한이 없습니다.");
+            }
             ReviewComment deletedComment = reviewComment.delete();
 
             reviewCommentRepository.save(deletedComment);
@@ -130,7 +138,7 @@ public class ReviewCommentService {
         }
 
         return ReviewCommentResponseDto.builder()
-                .reviewId(reviewComment.getId())
+                .reviewId(reviewComment.getReviewId())
                 .userId(userId)
                 .userName(userName)
                 .comment(reviewComment.getComment())
