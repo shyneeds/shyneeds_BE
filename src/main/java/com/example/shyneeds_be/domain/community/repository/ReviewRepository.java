@@ -48,4 +48,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     ,nativeQuery = true)
     Optional<Review> findByReservationId(@Param("reservationId") Long reservationId);
 
+
+    // [메인] 베스트 후기 - 조회수 많은 순, 최신순
+    @Query(value =  "SELECT * FROM shyneeds.review " +
+            "WHERE " +
+            "deleted_flg = 0 " +
+            "ORDER BY lookup_count, updated_at DESC " +
+            "LIMIT 10",
+    nativeQuery = true)
+    List<Review> findBestReviewList();
+
 }

@@ -2,6 +2,7 @@ package com.example.shyneeds_be.domain.community.service;
 
 import com.example.shyneeds_be.domain.community.model.dto.request.ReviewRegisterRequestDto;
 import com.example.shyneeds_be.domain.community.model.dto.request.ReviewUpdateRequestDto;
+import com.example.shyneeds_be.domain.community.model.dto.response.BestReviewResponseDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewMainResponseDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewResponseDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.VisitPackageResponseDto;
@@ -297,5 +298,37 @@ public class ReviewService {
         } catch (Exception e){
             return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "삭제에 실패했습니다. " + e.getMessage());
         }
+    }
+
+
+    // 메인 화면 베스트 후기
+    public List<BestReviewResponseDto> getBestReviewList(){
+        try{
+            return reviewRepository.findBestReviewList().stream().map(this::responseBestReview).toList();
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private BestReviewResponseDto responseBestReview(Review review){
+
+
+        String author = "탈퇴회원";
+        Optional<User> optionalUser = userRepository.findById(review.getUserId());
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+
+            author = this.getMaskingAuthor(user.getName());
+        }
+
+        return BestReviewResponseDto.builder()
+                .id(review.getId())
+                .title(review.getTitle())
+                .mainImage(review.getMainImage())
+                .author(author)
+                .contents(review.getContents())
+                .updatedAt(review.getUpdatedAt())
+                .build();
     }
 }
