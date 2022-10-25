@@ -12,6 +12,9 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.util.TimeZone;
+
 @SpringBootApplication
 public class ShyneedsBeApplication {
 
@@ -19,6 +22,11 @@ public class ShyneedsBeApplication {
         SpringApplication.run(ShyneedsBeApplication.class, args);
     }
 
+
+    @PostConstruct
+    public void timezone(){
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+    }
 
     @Component
     public static class StringToTravelPackageRegisterInfo implements Converter<String, TravelPackageRegisterRequestDto> {
