@@ -74,7 +74,7 @@ public class ReservationService {
         }
     }
 
-//  예약번호 생성 (날짜 + 네자리 난수)
+//  예약번호 생성 (날짜 + 다섯자리 난수)
     public String createReservationNumber(){
         String pattern = "yyyyMMdd";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
@@ -83,7 +83,7 @@ public class ReservationService {
         Random random = new Random();
         int createNum = 0;
         String ranNum = "";
-        int letter = 4;
+        int letter = 5;
         String resultNum = "";
 
         for (int i=0; i<letter; i++){
