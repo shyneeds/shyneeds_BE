@@ -21,7 +21,7 @@ public class UserController {
 
     @ApiOperation(value = "유저 정보 수정 기능")
     @Auth
-    @PatchMapping(value=  "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping(value=  "",  consumes="multipart/form-data")
     public ApiResponseDto updateUserInfo(HttpServletRequest req,
                                          @RequestPart(value = "userInfo") UpdateUserRequestDto updateUserRequest,
                                          @RequestPart("profileImage") MultipartFile profileImage){
