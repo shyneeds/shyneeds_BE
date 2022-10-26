@@ -74,6 +74,7 @@ public class MyPageService {
             for (Reservation reservation : reservationList) {
                 myPageReservationResponseList.add(
                         MyPageReservationResponseDto.builder()
+                                .reservationId(reservation.getId())
                                 .reservationNumber(reservation.getReservationNumber())
                                 .reservatedAt(reservation.getCreatedAt())
                                 .reservationStatus(reservation.getReservationStatus())
