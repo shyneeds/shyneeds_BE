@@ -23,7 +23,7 @@ public class UserController {
     @Auth
     @PatchMapping(value=  "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ApiResponseDto updateUserInfo(HttpServletRequest req,
-                                         @RequestPart("updateUserRequest") UpdateUserRequestDto updateUserRequest,
+                                         @RequestPart(value = "userInfo") UpdateUserRequestDto updateUserRequest,
                                          @RequestPart("profileImage") MultipartFile profileImage){
         return userService.updateUser((Long)req.getAttribute("userId"), updateUserRequest, profileImage);
     }
