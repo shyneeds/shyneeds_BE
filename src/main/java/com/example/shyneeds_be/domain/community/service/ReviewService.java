@@ -121,7 +121,9 @@ public class ReviewService {
             }
 
             String bucketName = bucket + "/review/upload";
-            return itemS3Uploader.uploadLocal(upload, bucketName);
+
+
+            return "https://shyneeds.s3.ap-northeast-2.amazonaws.com/review/upload/" + itemS3Uploader.uploadLocal(upload, bucketName);
 
 
         } catch (Exception e){
