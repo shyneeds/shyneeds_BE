@@ -33,6 +33,9 @@ public class ReviewResponseDto {
     @ApiModelProperty(name = "좋아요 갯수", required = false,  example = "")
     private int likeCount;
 
+    @ApiModelProperty(name = "로그인 한 회원의 좋아요 여부", required = false,  example = "")
+    private boolean isLike;
+
     @ApiModelProperty(name = "후기 내용(contents)", required = false,  example = "")
     private String contents;
 

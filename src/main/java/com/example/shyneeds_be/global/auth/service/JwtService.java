@@ -23,8 +23,11 @@ public class JwtService {
 
         //1. JWT 추출
         String accessToken = jwtHeaderUtil.getAccessToken(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
+
+        // 비회원 처리
         if(accessToken == null || accessToken.length() == 0){
-            throw new IllegalAccessException("EMPTY_ACCESS_TOKEN");
+//            throw new IllegalAccessException("EMPTY_ACCESS_TOKEN");
+            return 0L;
         }
         try {
             final String payloadJWT = accessToken.split("\\.")[1];
