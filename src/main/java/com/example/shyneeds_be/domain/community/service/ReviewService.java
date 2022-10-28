@@ -242,7 +242,9 @@ public class ReviewService {
 
         return ReviewResponseDto.builder()
                 .id(review.getId())
+                .reservationId(review.getReservationId())
                 .title(review.getTitle())
+                .mainImage(review.getMainImage())
                 .updatedAt(review.getUpdatedAt())
                 .author(author)
                 .lookupCount(review.getLookupCount())
