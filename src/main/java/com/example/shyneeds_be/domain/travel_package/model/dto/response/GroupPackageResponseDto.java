@@ -21,6 +21,9 @@ public class GroupPackageResponseDto {
     @ApiModelProperty(name = "상품 메인 이미지", required = false, example = "")
     private String mainImage;
 
+    @ApiModelProperty(name = "가격", required = false, example = "")
+    private String price;
+
     @ApiModelProperty(name = "상품 키워드", required = false, example = "")
     private String keyword;
 
