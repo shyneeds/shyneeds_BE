@@ -17,6 +17,8 @@ import java.util.List;
 @Builder
 public class MyPageReservationResponseDto {
 
+    private Long reservationId;
+
     private String reservationNumber;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")

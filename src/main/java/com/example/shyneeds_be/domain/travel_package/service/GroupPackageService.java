@@ -53,6 +53,7 @@ public class GroupPackageService {
                 .travelPackageId(groupPackage.getTravelId())
                 .travelPackageTitle(groupPackage.getTravelTitle())
                 .mainImage(mainImage)
+                .price(groupPackage.getPrice())
                 .keyword(groupPackage.getSearchKeyword())
                 .subCategoryId(groupPackage.getSubCategoryId())
                 .subCategoryTitle(groupPackage.getSubCategoryTitle())

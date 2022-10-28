@@ -3,6 +3,8 @@ package com.example.shyneeds_be.global.service;
 import com.example.shyneeds_be.domain.category.model.entity.CategoryTitle;
 import com.example.shyneeds_be.domain.category.model.response.CategoryTitleResponseDto;
 import com.example.shyneeds_be.domain.category.repository.CategoryRepository;
+import com.example.shyneeds_be.domain.community.model.dto.response.BestReviewResponseDto;
+import com.example.shyneeds_be.domain.community.service.ReviewService;
 import com.example.shyneeds_be.domain.travel_package.model.dto.response.TravelPackageResponseDto;
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.TravelPackage;
 import com.example.shyneeds_be.domain.travel_package.repository.TravelPackageRepository;
@@ -32,6 +34,8 @@ public class MainService {
 
     private final CategoryRepository categoryRepository;
 
+    private final ReviewService reviewService;
+
     /*
     메인 화면
     - 메인 배너
@@ -50,9 +54,13 @@ public class MainService {
                 mainTravelPackageMap.put(category, this.getTravelPackageList(category) );
             }
 
+
+            List<BestReviewResponseDto> bestReviewList = reviewService.getBestReviewList();
+
             MainResponseDto mainResponseDto = MainResponseDto.builder()
                     .mainBannerList(mainBannerList)
                     .mainCategoryPackageList(mainTravelPackageMap)
+                    .bestReviewList(bestReviewList)
                     .build();
 
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", mainResponseDto);

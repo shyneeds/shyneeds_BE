@@ -55,10 +55,12 @@ public class ReviewController {
     }
 
 
+    @Auth
     @ApiOperation(value = "리뷰 상세 조회")
     @GetMapping("/{id}/details")
-    public ApiResponseDto<ReviewResponseDto> getReview(@PathVariable("id") Long reviewId){
-        return reviewService.getReview(reviewId);
+    public ApiResponseDto<ReviewResponseDto> getReview(HttpServletRequest request, @PathVariable("id") Long reviewId){
+        User user = User.builder().id((Long) request.getAttribute("userId")).build();
+        return reviewService.getReview(user, reviewId);
     }
 
 

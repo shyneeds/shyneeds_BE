@@ -2,6 +2,7 @@ package com.example.shyneeds_be.domain.community.service;
 
 import com.example.shyneeds_be.domain.community.model.dto.request.ReviewRegisterRequestDto;
 import com.example.shyneeds_be.domain.community.model.dto.request.ReviewUpdateRequestDto;
+import com.example.shyneeds_be.domain.community.model.dto.response.BestReviewResponseDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewMainResponseDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewResponseDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.VisitPackageResponseDto;
@@ -120,7 +121,9 @@ public class ReviewService {
             }
 
             String bucketName = bucket + "/review/upload";
-            return itemS3Uploader.uploadLocal(upload, bucketName);
+
+
+            return "https://shyneeds.s3.ap-northeast-2.amazonaws.com/review/upload/" + itemS3Uploader.uploadLocal(upload, bucketName);
 
 
         } catch (Exception e){
@@ -176,7 +179,7 @@ public class ReviewService {
     }
 
     // 리뷰 상세 조회
-    public ApiResponseDto<ReviewResponseDto> getReview(Long reviewId) {
+    public ApiResponseDto<ReviewResponseDto> getReview(User user, Long reviewId) {
         try{
             Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NoSuchElementException("해당 리뷰를 찾을 수 없습니다."));
 
@@ -186,7 +189,9 @@ public class ReviewService {
 
             Review detailsReview = reviewRepository.save(increaseLookupReview);
 
-            ReviewResponseDto reviewResponseDto = this.responseDetails(detailsReview);
+            // 0 번이면 비회원
+            Long loginUserId = user.getId();
+            ReviewResponseDto reviewResponseDto = this.responseDetails(loginUserId, detailsReview);
 
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", reviewResponseDto);
         } catch (Exception e){
@@ -196,14 +201,26 @@ public class ReviewService {
 
 
     // 리뷰 상세 보기 응답
-    private ReviewResponseDto responseDetails(Review review) {
+    private ReviewResponseDto responseDetails(Long loginUserId, Review review) {
 
+        // 작성자의 이름 마스킹
         String author = "탈퇴회원";
         Optional<User> optionalUser = userRepository.findById(review.getUserId());
+        boolean isLike = false;
         if(optionalUser.isPresent()){
             User user = optionalUser.get();
 
             author = this.getMaskingAuthor(user.getName());
+
+            // 로그인 회원의 좋아요 여부
+            Optional<ReviewLike> optionalReviewLike = reviewLikeRepository.findIsLike(loginUserId, review.getId());
+
+            if(optionalReviewLike.isEmpty()){
+                isLike = false;
+            } else {
+                ReviewLike reviewLike = optionalReviewLike.get();
+                isLike = reviewLike.isLikeFlg() ? true : false;
+            }
         }
 
 
@@ -225,11 +242,14 @@ public class ReviewService {
 
         return ReviewResponseDto.builder()
                 .id(review.getId())
+                .reservationId(review.getReservationId())
                 .title(review.getTitle())
+                .mainImage(review.getMainImage())
                 .updatedAt(review.getUpdatedAt())
                 .author(author)
                 .lookupCount(review.getLookupCount())
                 .likeCount(this.getLikeCount(review.getId()))
+                .isLike(isLike)
                 .contents(review.getContents())
                 .visitPackageResponseDto(visitPackageResponseDto)
                 .build();
@@ -297,5 +317,37 @@ public class ReviewService {
         } catch (Exception e){
             return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "삭제에 실패했습니다. " + e.getMessage());
         }
+    }
+
+
+    // 메인 화면 베스트 후기
+    public List<BestReviewResponseDto> getBestReviewList(){
+        try{
+            return reviewRepository.findBestReviewList().stream().map(this::responseBestReview).toList();
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private BestReviewResponseDto responseBestReview(Review review){
+
+
+        String author = "탈퇴회원";
+        Optional<User> optionalUser = userRepository.findById(review.getUserId());
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+
+            author = this.getMaskingAuthor(user.getName());
+        }
+
+        return BestReviewResponseDto.builder()
+                .id(review.getId())
+                .title(review.getTitle())
+                .mainImage(review.getMainImage())
+                .author(author)
+                .contents(review.getContents())
+                .updatedAt(review.getUpdatedAt())
+                .build();
     }
 }

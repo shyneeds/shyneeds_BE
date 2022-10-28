@@ -1,6 +1,7 @@
 package com.example.shyneeds_be.domain.user.model.entity;
 
 import com.example.shyneeds_be.domain.cart.model.entity.Cart;
+import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -73,9 +74,14 @@ public class User {
     @JoinColumn(name = "refresh_token_id")
     private RefreshToken refreshToken;
 
+
     @JsonBackReference
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Cart> carts;
+    private List<Reservation> reservationList;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Cart> cartList;
 
     public void updateInfo(String password, String name, String phoneNumber, Date birthday, String gender) {
         this.password = password;

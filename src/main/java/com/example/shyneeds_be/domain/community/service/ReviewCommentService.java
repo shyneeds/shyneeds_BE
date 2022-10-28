@@ -36,6 +36,7 @@ public class ReviewCommentService {
     public ApiResponseDto register(User user, ReviewCommentRequestDto commentRequestDto) {
         try{
 
+            userRepository.findById(user.getId()).orElseThrow(() -> new NoSuchElementException("회원정보를 찾을 수 없습니다."));
 
             ReviewComment newReviewComment = ReviewComment.builder()
                     .reviewId(commentRequestDto.getReviewId())
@@ -138,6 +139,7 @@ public class ReviewCommentService {
         }
 
         return ReviewCommentResponseDto.builder()
+                .id(reviewComment.getId())
                 .reviewId(reviewComment.getReviewId())
                 .userId(userId)
                 .userName(userName)

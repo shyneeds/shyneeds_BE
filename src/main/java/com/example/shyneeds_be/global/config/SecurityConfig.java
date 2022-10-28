@@ -33,7 +33,7 @@ public class SecurityConfig {
                         request -> {
                             CorsConfiguration cors = new CorsConfiguration();
                             cors.setAllowedOrigins(List.of("*", "http://localhost:3000"));
-                            cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                            cors.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                             cors.setAllowedHeaders(List.of("*"));
 
                             return cors;
@@ -51,6 +51,9 @@ public class SecurityConfig {
                 .antMatchers("/api/my/user/**").authenticated()
                 .antMatchers("/api/reservation/**").authenticated()
                 .antMatchers("/api/cart/**").authenticated()
+                .antMatchers("/api/review/register", "/api/review/update", "/api/review/mypage").authenticated()
+                .antMatchers("/api/comment/register", "/api/comment/{\\d+}",  "/api/comment/update").authenticated()
+                .antMatchers("/api/review/like").authenticated()
                 .and()
 
                 .addFilterBefore(new JwtAuthenticationFilter(authTokenProvider), UsernamePasswordAuthenticationFilter.class)

@@ -3,10 +3,13 @@ package com.example.shyneeds_be.global.controller;
 import com.example.shyneeds_be.global.auth.dto.*;
 import com.example.shyneeds_be.global.auth.dto.request.ValidateRefreshRequestDto;
 import com.example.shyneeds_be.global.auth.dto.response.RecreatedAccessTokenResponseDto;
+import com.example.shyneeds_be.global.auth.jwt.Auth;
 import com.example.shyneeds_be.global.auth.service.OauthService;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor

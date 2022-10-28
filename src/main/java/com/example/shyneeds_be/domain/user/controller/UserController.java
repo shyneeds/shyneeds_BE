@@ -21,17 +21,17 @@ public class UserController {
 
     @ApiOperation(value = "유저 정보 수정 기능")
     @Auth
-    @PatchMapping(value=  "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping(value=  "",  consumes="multipart/form-data")
     public ApiResponseDto updateUserInfo(HttpServletRequest req,
-                                         @RequestPart("updateUserRequest") UpdateUserRequestDto updateUserRequest,
+                                         @RequestPart(value = "userInfo") UpdateUserRequestDto updateUserRequest,
                                          @RequestPart("profileImage") MultipartFile profileImage){
         return userService.updateUser((Long)req.getAttribute("userId"), updateUserRequest, profileImage);
     }
 
     @ApiOperation(value = "회원 탈퇴 기능")
-    @DeleteMapping("/{id}")
-    public ApiResponseDto deleteUser(@PathVariable("id") Long userId){
-        return userService.deleteUser(userId);
+    @Auth
+    @DeleteMapping("")
+    public ApiResponseDto deleteUser(HttpServletRequest req){
+        return userService.deleteUser((Long)req.getAttribute("userId"));
     }
-
 }
