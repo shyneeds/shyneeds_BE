@@ -84,7 +84,7 @@ public class OauthService {
                     .build());
 
         } catch (Exception e){
-            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "로그인에 실패했습니다" + e.getMessage());
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "로그인에 실패했습니다 " + e.getMessage());
         }
 
     }
@@ -170,7 +170,6 @@ public class OauthService {
             } else {
                 User user = userRepository.findByKakaoId(kakaoId);
                 token = authTokenProvider.createToken(kakaoUser.getEmail(), user.getId() ,user.getRole());
-
 
                 if (user.getRefreshToken() != null){
                     refreshTokenRepository.delete(user.getRefreshToken());

@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .antMatchers("/api/review/register", "/api/review/update", "/api/review/mypage").authenticated()
                 .antMatchers("/api/comment/register", "/api/comment/{\\d+}",  "/api/comment/update").authenticated()
                 .antMatchers("/api/review/like").authenticated()
+                .anyRequest().permitAll()
                 .and()
 
                 .addFilterBefore(new JwtAuthenticationFilter(authTokenProvider), UsernamePasswordAuthenticationFilter.class)
