@@ -70,11 +70,6 @@ public class User {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "refresh_token_id")
-    private RefreshToken refreshToken;
-
-
     @JsonBackReference
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Reservation> reservationList;
@@ -115,7 +110,4 @@ public class User {
         this.gender = gender;
     }
 
-    public void saveRefreshToken(RefreshToken refreshToken) {
-        this.refreshToken = refreshToken;
-    }
 }

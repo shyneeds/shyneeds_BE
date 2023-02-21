@@ -30,8 +30,8 @@ public class AuthController {
         return oauthService.kakaoLogin(authAccessToken);
     }
 
-    @PostMapping("/refresh/{id}")
-    public ApiResponseDto<RecreatedAccessTokenResponseDto> validateRefreshToken(@PathVariable(name = "id") Long userId, @RequestHeader("REFRESH_TOKEN") ValidateRefreshRequestDto validateRefreshRequest){
-        return oauthService.validateRefreshToken(userId, validateRefreshRequest);
-    }
+//    @PostMapping("/refresh/{id}")
+//    public ApiResponseDto<RecreatedAccessTokenResponseDto> validateRefreshToken(@PathVariable(name = "id") Long userId, @RequestHeader("REFRESH_TOKEN") ValidateRefreshRequestDto validateRefreshRequest){
+//        return oauthService.validateRefreshToken(userId, validateRefreshRequest);
+//    }
 }

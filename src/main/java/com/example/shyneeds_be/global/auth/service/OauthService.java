@@ -1,8 +1,6 @@
 package com.example.shyneeds_be.global.auth.service;
 
-import com.example.shyneeds_be.domain.user.model.entity.RefreshToken;
 import com.example.shyneeds_be.domain.user.model.entity.User;
-import com.example.shyneeds_be.domain.user.repository.RefreshTokenRepository;
 import com.example.shyneeds_be.domain.user.repository.UserRepository;
 import com.example.shyneeds_be.global.auth.dto.AuthRequestDto;
 import com.example.shyneeds_be.global.auth.dto.AuthResponseDto;
@@ -18,6 +16,7 @@ import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -42,11 +41,12 @@ public class OauthService {
 
     private final UserRepository userRepository;
 
-    private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final ClientKakao clientKakao;
     private final AuthTokenProvider authTokenProvider;
+
+    private final RedisTemplate<String, String> redisTemplate;
 
     /*
         일반 로그인
@@ -62,19 +62,11 @@ public class OauthService {
 
             AuthToken token = authTokenProvider.generateToken(authentication, loginRequestDto.getEmail(), user.getId());
 
-            if (user.getRefreshToken() != null){
-                refreshTokenRepository.delete(user.getRefreshToken());
-            }
+            redisTemplate.opsForValue().set(
+                    authentication.getName(),
+                    token.getToken().getRefreshToken());
 
-            RefreshToken refreshToken = RefreshToken.builder()
-                    .refreshToken(token.getToken().getRefreshToken())
-                    .user(user)
-                    .build();
-            refreshTokenRepository.save(refreshToken);
-
-            user.saveRefreshToken(refreshToken);
             userRepository.save(user);
-
 
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "로그인에 성공했습니다",
                     AuthResponseDto.builder()
@@ -151,13 +143,9 @@ public class OauthService {
 
                 token = authTokenProvider.createAppToken(user.getEmail(), user.getId(), user.getRole());
 
-                RefreshToken refreshToken = RefreshToken.builder()
-                        .refreshToken(token.getToken().getRefreshToken())
-                        .user(user)
-                        .build();
-
-                refreshTokenRepository.save(refreshToken);
-                user.saveRefreshToken(refreshToken);
+                redisTemplate.opsForValue().set(
+                        String.valueOf(user.getId()),
+                        token.getToken().getRefreshToken());
 
                 userRepository.save(user);
 
@@ -169,21 +157,8 @@ public class OauthService {
 
             } else {
                 User user = userRepository.findByKakaoId(kakaoId);
-                token = authTokenProvider.createToken(kakaoUser.getEmail(), user.getId() ,user.getRole());
+                token = authTokenProvider.createToken(kakaoUser.getEmail(), user.getId() , user.getRole());
 
-
-                if (user.getRefreshToken() != null){
-                    refreshTokenRepository.delete(user.getRefreshToken());
-                }
-
-                RefreshToken refreshToken = RefreshToken.builder()
-                        .refreshToken(token.getToken().getRefreshToken())
-                        .user(user)
-                        .build();
-
-                refreshTokenRepository.save(refreshToken);
-
-                user.saveRefreshToken(refreshToken);
                 userRepository.save(user);
 
                 return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "카카오 로그인에 성공했습니다", AuthResponseDto.builder()
@@ -198,18 +173,19 @@ public class OauthService {
     }
 
     /*
-        refreshToken 이용 accessToken 재발급
+        refreshToken 이용 accessToken 재발급 이거할차례
     */
-    public ApiResponseDto<RecreatedAccessTokenResponseDto> validateRefreshToken(Long userId,ValidateRefreshRequestDto validateRefreshRequest) {
+    public ApiResponseDto<RecreatedAccessTokenResponseDto> validateRefreshToken(Long userId, ValidateRefreshRequestDto validateRefreshRequest) {
         try{
-            if(validateRefreshRequest.getRefreshToken().equals(userRepository.findById(userId).get().getRefreshToken().getRefreshToken())) {
+            String refreshToken = redisTemplate.opsForValue().get(userId);
+            if(refreshToken.equals(validateRefreshRequest.getRefreshToken())) {
                 AuthToken createdAccessToken = authTokenProvider.validateRefreshToken(validateRefreshRequest.getRefreshToken());
 
                 return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "새로운 Access token 발급 성공",
                         RecreatedAccessTokenResponseDto.builder()
                                 .accessToken(createdAccessToken.getToken().getAccessToken())
                                 .build());
-            } else{
+            } else {
                 return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "refresh token이 일치하지 않습니다.");
             }
         } catch (ExpiredJwtException e){

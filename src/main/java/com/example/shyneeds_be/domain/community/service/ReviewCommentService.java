@@ -10,7 +10,6 @@ import com.example.shyneeds_be.domain.user.repository.UserRepository;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.Pagination;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
-import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

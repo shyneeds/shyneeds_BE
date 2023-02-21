@@ -9,21 +9,16 @@ import com.example.shyneeds_be.domain.user.model.entity.User;
 import com.example.shyneeds_be.global.auth.jwt.Auth;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/review")
