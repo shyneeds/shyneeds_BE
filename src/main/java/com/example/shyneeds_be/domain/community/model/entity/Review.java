@@ -32,8 +32,8 @@ public class Review {
     @Column(name = "main_image")
     private String mainImage;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "member_id")
+    private Long memberId;
 
     @Column(name = "contents")
     private String contents;

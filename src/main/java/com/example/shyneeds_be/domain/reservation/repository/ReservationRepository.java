@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    List<Reservation> findAllByUserId(Long id);
+    List<Reservation> findAllByMemberId(Long id);
 
     Reservation findByReservationNumber(String reservationNumber);
 
     @Query(value = "SELECT * FROM shyneeds.reservation " +
-            "WHERE user_id = :userId AND id = :reservationId " +
+            "WHERE member_id = :memberId AND id = :reservationId " +
             "AND reservation_status = '예약확정' "
     ,nativeQuery = true)
-    Optional<Reservation> findByUserIdAndReservationId(@Param("userId") Long userId, @Param("reservationId") Long reservationId);
+    Optional<Reservation> findByMemberIdAndReservationId(@Param("memberId") Long memberId, @Param("reservationId") Long reservationId);
 }
