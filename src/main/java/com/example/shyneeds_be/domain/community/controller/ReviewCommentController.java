@@ -5,7 +5,6 @@ import com.example.shyneeds_be.domain.community.model.dto.request.ReviewCommentU
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewCommentResponseDto;
 import com.example.shyneeds_be.domain.community.service.ReviewCommentService;
 import com.example.shyneeds_be.domain.user.model.entity.User;
-import com.example.shyneeds_be.global.auth.jwt.Auth;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ public class ReviewCommentController {
     private final ReviewCommentService reviewCommentService;
 
 
-    @Auth
+
     @ApiOperation(value = "댓글 등록하기")
     @PostMapping("/register")
     public ApiResponseDto register(HttpServletRequest request, @RequestBody ReviewCommentRequestDto reviewCommentRequestDto) {
@@ -42,7 +41,7 @@ public class ReviewCommentController {
         return reviewCommentService.getCommentList(reviewId, pageable);
     }
 
-    @Auth
+
     @ApiOperation(value = "댓글 불러오기")
     @GetMapping("/{id}")
     public ApiResponseDto<ReviewCommentResponseDto> getComment(HttpServletRequest request,  @PathVariable("id") Long commentId){
@@ -54,7 +53,7 @@ public class ReviewCommentController {
     }
 
 
-    @Auth
+
     @ApiOperation(value = "댓글 수정하기")
     @PutMapping("/update")
     public ApiResponseDto updateComment(HttpServletRequest request, @RequestBody ReviewCommentUpdateRequestDto reviewCommentUpdateRequestDto){
@@ -65,7 +64,6 @@ public class ReviewCommentController {
         return reviewCommentService.updateComment(user, reviewCommentUpdateRequestDto);
     }
 
-    @Auth
     @ApiOperation(value = "댓글 삭제하기")
     @DeleteMapping("/{id}")
     public ApiResponseDto deleteComment(HttpServletRequest request, @PathVariable("id") Long commentId) {

@@ -1,4 +1,4 @@
-package com.example.shyneeds_be.global.auth.dto.request;
+package com.example.shyneeds_be.global.security.oauth.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ValidateRefreshRequestDto {
     private String refreshToken;
+    private String accessToken;
 }

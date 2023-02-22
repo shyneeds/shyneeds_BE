@@ -6,7 +6,6 @@ import com.example.shyneeds_be.domain.community.model.dto.response.ReviewMainRes
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewResponseDto;
 import com.example.shyneeds_be.domain.community.service.ReviewService;
 import com.example.shyneeds_be.domain.user.model.entity.User;
-import com.example.shyneeds_be.global.auth.jwt.Auth;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,6 @@ public class ReviewController {
     }
 
 
-    @Auth
     @ApiOperation(value = "리뷰 저장")
     @PostMapping("/register")
     public ApiResponseDto registerReview(HttpServletRequest request, @RequestBody ReviewRegisterRequestDto reviewRegisterRequestDto) {
@@ -50,7 +48,6 @@ public class ReviewController {
     }
 
 
-    @Auth
     @ApiOperation(value = "리뷰 상세 조회")
     @GetMapping("/{id}/details")
     public ApiResponseDto<ReviewResponseDto> getReview(HttpServletRequest request, @PathVariable("id") Long reviewId){
@@ -59,7 +56,6 @@ public class ReviewController {
     }
 
 
-    @Auth
     @ApiOperation(value = "리뷰 수정")
     @PutMapping("/update")
     public ApiResponseDto updateReview(HttpServletRequest request, @RequestBody ReviewUpdateRequestDto reviewUpdateRequestDto) {
@@ -67,7 +63,6 @@ public class ReviewController {
         return reviewService.updateReview(user, reviewUpdateRequestDto);
     }
 
-    @Auth
     @ApiOperation(value = "리뷰 삭제")
     @DeleteMapping("/{id}")
     public ApiResponseDto deleteReview(HttpServletRequest request, @PathVariable("id") Long reviewId) {
@@ -77,7 +72,6 @@ public class ReviewController {
 
 
 
-    @Auth
     @ApiOperation(value = "회원이 작성한 리뷰 리스트 조회")
     @GetMapping("/mypage")
 

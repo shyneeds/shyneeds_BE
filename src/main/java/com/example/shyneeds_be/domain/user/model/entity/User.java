@@ -49,8 +49,9 @@ public class User {
     @Column(name = "gender")
     private String gender;
 
-    @Column(name = "role")
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "authority")
+    private Authority authority;
 
     @Column(name = "kakao_id")
     private Long kakaoId;

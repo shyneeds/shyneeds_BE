@@ -1,8 +1,9 @@
-package com.example.shyneeds_be.global.auth.oauth;
+package com.example.shyneeds_be.global.security.oauth.oauth;
 
 
+import com.example.shyneeds_be.domain.user.model.entity.Authority;
 import com.example.shyneeds_be.domain.user.model.entity.User;
-import com.example.shyneeds_be.global.auth.dto.KakaoUserResponseDto;
+import com.example.shyneeds_be.global.security.oauth.dto.KakaoUserResponseDto;
 import com.example.shyneeds_be.global.exception.TokenValidFailedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,7 @@ public class ClientKakao implements ClientProxy {
                 .name(kakaoUserResponse.getProperties().getNickname())
                 .email(kakaoUserResponse.getKakao_account().getEmail())
                 .gender(kakaoUserResponse.getKakao_account().getGender())
-                .role("USER")
+                .authority(Authority.ROLE_USER)
                 .build();
     }
 

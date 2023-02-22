@@ -1,12 +1,14 @@
-package com.example.shyneeds_be.global.auth.dto;
+package com.example.shyneeds_be.global.security.oauth.dto.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class AuthRequestDto {
+@Builder
+public class RecreatedAccessTokenResponseDto {
     private String accessToken;
 }

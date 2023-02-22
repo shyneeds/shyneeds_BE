@@ -1,10 +1,8 @@
-package com.example.shyneeds_be.global.auth.dto;
+package com.example.shyneeds_be.global.security.oauth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.sql.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
