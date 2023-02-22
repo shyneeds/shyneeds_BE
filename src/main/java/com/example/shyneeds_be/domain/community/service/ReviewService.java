@@ -12,11 +12,12 @@ import com.example.shyneeds_be.domain.community.model.entity.ReviewLikeCount;
 import com.example.shyneeds_be.domain.community.model.entity.VisitPackage;
 import com.example.shyneeds_be.domain.community.repository.ReviewLikeRepository;
 import com.example.shyneeds_be.domain.community.repository.ReviewRepository;
+import com.example.shyneeds_be.domain.member.service.MemberService;
 import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
 import com.example.shyneeds_be.domain.reservation.repository.ReservationRepository;
 import com.example.shyneeds_be.domain.travel_package.repository.TravelPackageRepository;
-import com.example.shyneeds_be.domain.user.model.entity.User;
-import com.example.shyneeds_be.domain.user.repository.UserRepository;
+import com.example.shyneeds_be.domain.member.model.entity.Member;
+import com.example.shyneeds_be.domain.member.repository.MemberRepository;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.Pagination;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,7 +41,8 @@ import java.util.*;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final ReservationRepository reservationRepository;
     private final TravelPackageRepository travelPackageRepository;
     private final ReviewLikeRepository reviewLikeRepository;
@@ -69,13 +72,13 @@ public class ReviewService {
     // 리뷰 등록
     public ApiResponseDto register(User user, ReviewRegisterRequestDto reviewRegisterRequestDto) {
         try{
-
+            Member member = memberService.findMemberByJwt(user);
 
             // 해당 유저의 예약확정 된 예약인지 확인
-            Long userId = user.getId();
+            Long memberId = member.getId();
             Long reservationId = reviewRegisterRequestDto.getReservationId();
 
-            Optional<Reservation> optionalReservation = reservationRepository.findByUserIdAndReservationId(userId, reservationId);
+            Optional<Reservation> optionalReservation = reservationRepository.findByMemberIdAndReservationId(memberId, reservationId);
 
             if(optionalReservation.isEmpty()){
                 return ApiResponseDto.of(ResponseStatusCode.UNAUTHORIZED.getValue(), "예약 정보가 일치하지 않은 회원이거나 예약상태 확인이 필요합니다.");
@@ -96,7 +99,7 @@ public class ReviewService {
             Review newReview = Review.builder()
                     .title(reviewRegisterRequestDto.getTitle())
                     .mainImage(reviewRegisterRequestDto.getMainImage())
-                    .userId(userId)
+                    .memberId(memberId)
                     .contents(reviewRegisterRequestDto.getContents())
                     .reservationId(reservationId)
                     .dispFlg(true)
@@ -136,7 +139,7 @@ public class ReviewService {
     private ReviewMainResponseDto response(Review review) {
 
         // user name 마스킹 (김**) 처리
-        Optional<User> optionalUser = userRepository.findById(Long.valueOf(review.getUserId()));
+        Optional<Member> optionalUser = memberRepository.findById(Long.valueOf(review.getMemberId()));
         String author = "탈퇴회원";
         if(optionalUser.isPresent()){
             author = getMaskingAuthor(optionalUser.get().getName());
@@ -165,8 +168,9 @@ public class ReviewService {
     // [Mypage] 내가 작성한 리뷰 조회
     public ApiResponseDto<List<ReviewMainResponseDto>> getMyReviewList(User user, Pageable pageable) {
         try{
+            Member member = memberService.findMemberByJwt(user);
 
-            Page<Review> userReviewList = reviewRepository.findByUserId(user.getId(), pageable);
+            Page<Review> userReviewList = reviewRepository.findByUserId(member.getId(), pageable);
 
             Pagination pagination = Pagination.getPagination(userReviewList);
 
@@ -181,8 +185,9 @@ public class ReviewService {
     // 리뷰 상세 조회
     public ApiResponseDto<ReviewResponseDto> getReview(User user, Long reviewId) {
         try{
-            Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NoSuchElementException("해당 리뷰를 찾을 수 없습니다."));
+            Member member = memberService.findMemberByJwt(user);
 
+            Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NoSuchElementException("해당 리뷰를 찾을 수 없습니다."));
 
             // 조회수 증가
             Review increaseLookupReview = review.increaseLookup();
@@ -190,7 +195,7 @@ public class ReviewService {
             Review detailsReview = reviewRepository.save(increaseLookupReview);
 
             // 0 번이면 비회원
-            Long loginUserId = user.getId();
+            Long loginUserId = member.getId();
             ReviewResponseDto reviewResponseDto = this.responseDetails(loginUserId, detailsReview);
 
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "조회에 성공했습니다.", reviewResponseDto);
@@ -205,12 +210,12 @@ public class ReviewService {
 
         // 작성자의 이름 마스킹
         String author = "탈퇴회원";
-        Optional<User> optionalUser = userRepository.findById(review.getUserId());
+        Optional<Member> optionalUser = memberRepository.findById(review.getMemberId());
         boolean isLike = false;
         if(optionalUser.isPresent()){
-            User user = optionalUser.get();
+            Member member = optionalUser.get();
 
-            author = this.getMaskingAuthor(user.getName());
+            author = this.getMaskingAuthor(member.getName());
 
             // 로그인 회원의 좋아요 여부
             Optional<ReviewLike> optionalReviewLike = reviewLikeRepository.findIsLike(loginUserId, review.getId());
@@ -272,14 +277,15 @@ public class ReviewService {
     // 리뷰 수정
     public ApiResponseDto updateReview(User user, ReviewUpdateRequestDto reviewUpdateRequestDto) {
         try{
+            Member member = memberService.findMemberByJwt(user);
 
-            Long userId = user.getId();
+            Long userId = member.getId();
             Long reviewId = reviewUpdateRequestDto.getId();
 
-            userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("해당 유저 정보를 찾을 수 없습니다."));
+            memberRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("해당 유저 정보를 찾을 수 없습니다."));
             Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NoSuchElementException("리뷰 정보를 찾을 수 없습니다."));
 
-            if (review.getUserId() != user.getId()) {
+            if (review.getMemberId() != member.getId()) {
                 return ApiResponseDto.of(ResponseStatusCode.UNAUTHORIZED.getValue(), "삭제 권한이 없습니다.");
             }
 
@@ -301,11 +307,12 @@ public class ReviewService {
     // 리뷰 삭제
     public ApiResponseDto deleteReview(User user, Long reviewId) {
         try{
+            Member member = memberService.findMemberByJwt(user);
 
-            userRepository.findById(user.getId()).orElseThrow(() -> new NoSuchElementException("해당 유저 정보를 찾을 수 없습니다."));
+            memberRepository.findById(member.getId()).orElseThrow(() -> new NoSuchElementException("해당 유저 정보를 찾을 수 없습니다."));
             Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NoSuchElementException("리뷰 정보를 찾을 수 없습니다."));
 
-            if (review.getUserId() != user.getId()) {
+            if (review.getMemberId() != member.getId()) {
                 return ApiResponseDto.of(ResponseStatusCode.UNAUTHORIZED.getValue(), "삭제 권한이 없습니다.");
             }
 
@@ -334,11 +341,11 @@ public class ReviewService {
 
 
         String author = "탈퇴회원";
-        Optional<User> optionalUser = userRepository.findById(review.getUserId());
+        Optional<Member> optionalUser = memberRepository.findById(review.getMemberId());
         if(optionalUser.isPresent()){
-            User user = optionalUser.get();
+            Member member = optionalUser.get();
 
-            author = this.getMaskingAuthor(user.getName());
+            author = this.getMaskingAuthor(member.getName());
         }
 
         return BestReviewResponseDto.builder()
