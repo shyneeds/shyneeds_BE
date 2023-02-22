@@ -4,8 +4,8 @@ import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
 import com.example.shyneeds_be.domain.reservation.repository.ReservationRepository;
 import com.example.shyneeds_be.domain.reservation_package.model.entity.ReservationPackage;
 import com.example.shyneeds_be.domain.reservation_package.repository.ReservationPackageRepository;
-import com.example.shyneeds_be.domain.user.model.entity.User;
-import com.example.shyneeds_be.domain.user.repository.UserRepository;
+import com.example.shyneeds_be.domain.member.model.entity.Member;
+import com.example.shyneeds_be.domain.member.repository.MemberRepository;
 import com.example.shyneeds_be.global.model.dto.response.MyPageReservationPackageResponseDto;
 import com.example.shyneeds_be.global.model.dto.response.MyPageReservationResponseDto;
 import com.example.shyneeds_be.global.model.dto.response.MyPageResponseDto;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MyPageService {
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     private final ReservationRepository reservationRepository;
 
@@ -31,9 +31,9 @@ public class MyPageService {
     @Transactional
     public ApiResponseDto<MyPageResponseDto> getMyPageMain(Long id) {
         try{
-            User user = userRepository.findById(id).orElseThrow( () -> new IllegalArgumentException("없는 유저입니다."));
+            Member member = memberRepository.findById(id).orElseThrow( () -> new IllegalArgumentException("없는 유저입니다."));
 
-            MyPageResponseDto myPageResponse = myPageMainResponse(user);
+            MyPageResponseDto myPageResponse = myPageMainResponse(member);
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "마이페이지 데이터 불러오기 성공 ", myPageResponse);
         } catch (Exception e){
             return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "마이페이지 데이터 불러오기 실패 " + e.getMessage());
@@ -41,22 +41,22 @@ public class MyPageService {
     }
 
     @Transactional
-    public MyPageResponseDto myPageMainResponse(User user) {
+    public MyPageResponseDto myPageMainResponse(Member member) {
 
         String imageDir = "https://shyneeds.s3.ap-northeast-2.amazonaws.com/user/"+
-                user.getId().toString();
+                member.getId().toString();
         return MyPageResponseDto.builder()
                 .userInfo(
                         MyPageUserResponseDto.builder()
-                                .profileImage(imageDir+"/"+ user.getProfileImage())
-                                .email(user.getEmail())
-                                .name(user.getName())
-                                .phoneNumber(user.getPhoneNumber())
-                                .birthday(user.getBirthday())
-                                .gender(user.getGender())
-                                .totalPaymentAmount(user.getTotalPaymentAmount())
+                                .profileImage(imageDir+"/"+ member.getProfileImage())
+                                .email(member.getEmail())
+                                .name(member.getName())
+                                .phoneNumber(member.getPhoneNumber())
+                                .birthday(member.getBirthday())
+                                .gender(member.getGender())
+                                .totalPaymentAmount(member.getTotalPaymentAmount())
                         .build())
-                .reservationList(myPageReservationResponse(user.getId()))
+                .reservationList(myPageReservationResponse(member.getId()))
                 .build();
 
     }
@@ -67,8 +67,8 @@ public class MyPageService {
     @Transactional
     public List<MyPageReservationResponseDto> myPageReservationResponse(Long userId){
 
-        if (reservationRepository.findAllByUserId(userId) != null) {
-            List<Reservation> reservationList = reservationRepository.findAllByUserId(userId);
+        if (reservationRepository.findAllByMemberId(userId) != null) {
+            List<Reservation> reservationList = reservationRepository.findAllByMemberId(userId);
             List<MyPageReservationResponseDto> myPageReservationResponseList = new ArrayList<>();
 
             for (Reservation reservation : reservationList) {

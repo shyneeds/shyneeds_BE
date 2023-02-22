@@ -2,10 +2,12 @@ package com.example.shyneeds_be.domain.community.service;
 
 import com.example.shyneeds_be.domain.community.model.entity.ReviewLike;
 import com.example.shyneeds_be.domain.community.repository.ReviewLikeRepository;
-import com.example.shyneeds_be.domain.user.model.entity.User;
+import com.example.shyneeds_be.domain.member.model.entity.Member;
+import com.example.shyneeds_be.domain.member.service.MemberService;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,15 +21,16 @@ import java.util.Optional;
 public class ReviewLikeService {
 
     private final ReviewLikeRepository reviewLikeRepository;
-
+    private final MemberService memberService;
     // 사용자 정보로 한 번 누르면 좋아요, 한 번 더 누르면 좋아요 취소
     public ApiResponseDto<Boolean> likeOrUnLike(User user, Long reviewId){
         try{
 
+            Member member = memberService.findMemberByJwt(user);
             Boolean isLike = null;
 
             // 리뷰의 좋아요 검색
-            Optional<ReviewLike> optionalReviewLike = reviewLikeRepository.findIsLike(user.getId(), reviewId);
+            Optional<ReviewLike> optionalReviewLike = reviewLikeRepository.findIsLike(member.getId(), reviewId);
             // 리뷰의 좋아요가 없으면 좋아요 (true)
             if(optionalReviewLike.isEmpty()){
                 isLike = true;
@@ -44,7 +47,7 @@ public class ReviewLikeService {
             }
 
             ReviewLike like = ReviewLike.builder()
-                    .userId(user.getId())
+                    .userId(member.getId())
                     .reviewId(reviewId)
                     .likeFlg(isLike)
                     .createdAt(Timestamp.valueOf(LocalDateTime.now()))

@@ -18,13 +18,13 @@ public class ReviewCommentResponseDto {
     private Long id;
 
     @ApiModelProperty(value = "회원 고유번호", required = true, example = "")
-    private Long userId;
+    private Long memberId;
 
     @ApiModelProperty(value = "리뷰 고유번호", required = true, example = "")
     private Long reviewId;
 
     @ApiModelProperty(value = "회원 아이디", required = true, example = "")
-    private String userName;
+    private String memberName;
 
     @ApiModelProperty(value = "댓글 내용", required = true, example = "")
     private String comment;

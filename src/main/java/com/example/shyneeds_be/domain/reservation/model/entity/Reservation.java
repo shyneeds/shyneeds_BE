@@ -2,7 +2,7 @@ package com.example.shyneeds_be.domain.reservation.model.entity;
 
 import com.example.shyneeds_be.domain.reservation.model.enums.ReservationStatus;
 import com.example.shyneeds_be.domain.reservation_package.model.entity.ReservationPackage;
-import com.example.shyneeds_be.domain.user.model.entity.User;
+import com.example.shyneeds_be.domain.member.model.entity.Member;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -86,8 +86,8 @@ public class Reservation {
     private List<ReservationPackage> reservationPackages;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
 
     public void cancelReservation(String cancelReason, String cancelResonDetail) {
