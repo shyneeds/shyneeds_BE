@@ -1,4 +1,4 @@
-package com.example.shyneeds_be.global.security.oauth.dto;
+package com.example.shyneeds_be.domain.member.model.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Builder
-public class AuthResponseDto {
+public class RecreatedAccessTokenResponseDto {
     private String accessToken;
-    private String refreshToken;
-    private Long userId;
 }

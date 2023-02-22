@@ -10,8 +10,8 @@ import com.example.shyneeds_be.domain.reservation.repository.ReservationReposito
 import com.example.shyneeds_be.domain.reservation_package.model.entity.ReservationPackage;
 import com.example.shyneeds_be.domain.reservation_package.repository.ReservationPackageRepository;
 import com.example.shyneeds_be.domain.travel_package.repository.TravelPackageRepository;
-import com.example.shyneeds_be.domain.user.model.entity.User;
-import com.example.shyneeds_be.domain.user.repository.UserRepository;
+import com.example.shyneeds_be.domain.member.model.entity.Member;
+import com.example.shyneeds_be.domain.member.repository.MemberRepository;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +28,14 @@ import java.util.Random;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final ReservationPackageRepository reservationPackageRepository;
     private final TravelPackageRepository travelPackageRepository;
 
 //  예약하기
-    public ApiResponseDto addReservation(Long userId, AddReservationRequestDto addReservationRequest){
+    public ApiResponseDto addReservation(Long memberId, AddReservationRequestDto addReservationRequest){
         try {
-            User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("없는 사용자입니다."));
+            Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("없는 사용자입니다."));
 
             Reservation reservation = Reservation.builder()
                     .paymentMethod(addReservationRequest.getPaymentMethod())
@@ -50,7 +50,7 @@ public class ReservationService {
                     .reservatorName(addReservationRequest.getReservatorName())
                     .reservatorPhoneNumber(addReservationRequest.getReservatorPhoneNumber())
                     .reservatorEmail(addReservationRequest.getReservatorEmail())
-                    .user(user)
+                    .member(member)
                     .build();
 
             reservationRepository.save(reservation);
@@ -162,10 +162,10 @@ public class ReservationService {
         return reservationPackageDetaiList;
     }
 
-    public ApiResponseDto cancelReservation(Long userId ,String reservationNumber, CancelReservationRequestDto cancelReservationRequest) {
+    public ApiResponseDto cancelReservation(Long memberId ,String reservationNumber, CancelReservationRequestDto cancelReservationRequest) {
         try {
             if (reservationRepository.findByReservationNumber(reservationNumber) != null) {
-                if (reservationRepository.findAllByUserId(userId).contains(reservationRepository.findByReservationNumber(reservationNumber))) {
+                if (reservationRepository.findAllByMemberId(memberId).contains(reservationRepository.findByReservationNumber(reservationNumber))) {
                     Reservation reservation = reservationRepository.findByReservationNumber(reservationNumber);
                     reservation.cancelReservation(cancelReservationRequest.getCancelReason(), cancelReservationRequest.getCancelReasonDetail());
                     reservationRepository.save(reservation);

@@ -1,4 +1,4 @@
-package com.example.shyneeds_be.domain.user.model.entity;
+package com.example.shyneeds_be.domain.member.model.entity;
 
 import com.example.shyneeds_be.domain.cart.model.entity.Cart;
 import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-@Table(name = "user")
+@Table(name = "member")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,7 +26,7 @@ import java.util.List;
 @Builder
 @DynamicInsert
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,7 +37,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "user_name")
+    @Column(name = "member_name")
     private String name;
 
     @Column(name = "phone_number")
@@ -72,11 +72,11 @@ public class User {
     private Timestamp updatedAt;
 
     @JsonBackReference
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Reservation> reservationList;
 
     @JsonBackReference
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Cart> cartList;
 
     public void updateInfo(String password, String name, String phoneNumber, Date birthday, String gender) {

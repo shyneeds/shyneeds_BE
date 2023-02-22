@@ -5,7 +5,7 @@ import com.example.shyneeds_be.domain.community.model.dto.request.ReviewUpdateRe
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewMainResponseDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewResponseDto;
 import com.example.shyneeds_be.domain.community.service.ReviewService;
-import com.example.shyneeds_be.domain.user.model.entity.User;
+import com.example.shyneeds_be.domain.member.model.entity.Member;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +36,8 @@ public class ReviewController {
     @ApiOperation(value = "리뷰 저장")
     @PostMapping("/register")
     public ApiResponseDto registerReview(HttpServletRequest request, @RequestBody ReviewRegisterRequestDto reviewRegisterRequestDto) {
-        User user = User.builder().id((Long) request.getAttribute("userId")).build();
-        return reviewService.register(user, reviewRegisterRequestDto);
+        Member member = Member.builder().id((Long) request.getAttribute("userId")).build();
+        return reviewService.register(member, reviewRegisterRequestDto);
     }
 
     @ApiOperation(value = "리뷰 이미지 저장 (단일 파일 -> url 리턴)")
@@ -51,23 +51,23 @@ public class ReviewController {
     @ApiOperation(value = "리뷰 상세 조회")
     @GetMapping("/{id}/details")
     public ApiResponseDto<ReviewResponseDto> getReview(HttpServletRequest request, @PathVariable("id") Long reviewId){
-        User user = User.builder().id((Long) request.getAttribute("userId")).build();
-        return reviewService.getReview(user, reviewId);
+        Member member = Member.builder().id((Long) request.getAttribute("userId")).build();
+        return reviewService.getReview(member, reviewId);
     }
 
 
     @ApiOperation(value = "리뷰 수정")
     @PutMapping("/update")
     public ApiResponseDto updateReview(HttpServletRequest request, @RequestBody ReviewUpdateRequestDto reviewUpdateRequestDto) {
-        User user = User.builder().id((Long) request.getAttribute("userId")).build();
-        return reviewService.updateReview(user, reviewUpdateRequestDto);
+        Member member = Member.builder().id((Long) request.getAttribute("userId")).build();
+        return reviewService.updateReview(member, reviewUpdateRequestDto);
     }
 
     @ApiOperation(value = "리뷰 삭제")
     @DeleteMapping("/{id}")
     public ApiResponseDto deleteReview(HttpServletRequest request, @PathVariable("id") Long reviewId) {
-        User user = User.builder().id((Long) request.getAttribute("userId")).build();
-        return reviewService.deleteReview(user, reviewId);
+        Member member = Member.builder().id((Long) request.getAttribute("userId")).build();
+        return reviewService.deleteReview(member, reviewId);
     }
 
 
@@ -77,10 +77,10 @@ public class ReviewController {
 
     public ApiResponseDto<List<ReviewMainResponseDto>> getMyReviewList(HttpServletRequest request, @PageableDefault Pageable pageable) {
         Long userId = (Long) request.getAttribute("userId");
-        User user = User.builder()
+        Member member = Member.builder()
                 .id(userId)
                 .build();
-        return reviewService.getMyReviewList(user, pageable);
+        return reviewService.getMyReviewList(member, pageable);
     }
 
 }

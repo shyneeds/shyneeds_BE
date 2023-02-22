@@ -1,19 +1,15 @@
-package com.example.shyneeds_be.global.security.oauth.service;
+package com.example.shyneeds_be.domain.member.service;
 
-import com.example.shyneeds_be.domain.user.model.entity.Authority;
-import com.example.shyneeds_be.domain.user.model.entity.User;
-import com.example.shyneeds_be.domain.user.repository.UserRepository;
+import com.example.shyneeds_be.domain.member.model.dto.request.*;
+import com.example.shyneeds_be.domain.member.model.entity.Authority;
+import com.example.shyneeds_be.domain.member.model.entity.Member;
+import com.example.shyneeds_be.domain.member.repository.MemberRepository;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
+import com.example.shyneeds_be.global.network.s3.ItemS3Uploader;
 import com.example.shyneeds_be.global.security.jwt.TokenProvider;
 import com.example.shyneeds_be.global.security.jwt.dto.TokenDto;
-import com.example.shyneeds_be.global.security.oauth.dto.AuthRequestDto;
-import com.example.shyneeds_be.global.security.oauth.dto.AuthResponseDto;
-import com.example.shyneeds_be.global.security.oauth.dto.LoginRequestDto;
-import com.example.shyneeds_be.global.security.oauth.dto.SignupRequestDto;
-import com.example.shyneeds_be.global.security.oauth.dto.request.ValidateRefreshRequestDto;
-import com.example.shyneeds_be.global.security.oauth.dto.response.RecreatedAccessTokenResponseDto;
-import com.example.shyneeds_be.global.security.oauth.oauth.ClientKakao;
+import com.example.shyneeds_be.global.security.oauth.ClientKakao;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,13 +20,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
-public class OauthService {
+public class MemberService {
     @Value("${kakao.client-id}")
     String clientId;
 
@@ -40,16 +37,20 @@ public class OauthService {
     @Value("${kakao.front-url}")
     String frontUrl;
 
-    private final UserRepository userRepository;
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
+
+    private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final ClientKakao clientKakao;
     private final RedisTemplate<String, String> redisTemplate;
+    private final ItemS3Uploader itemS3Uploader;
 
     /*
-        일반 로그인
-    */
+            일반 로그인
+        */
     @Transactional
     public ApiResponseDto login(LoginRequestDto loginRequestDto){
         try {
@@ -75,14 +76,14 @@ public class OauthService {
 
     }
 
-    /*
+ /*
         일반 회원가입
     */
 
     @Transactional
     public ApiResponseDto signup(SignupRequestDto signupRequestDto){
         try{
-            if(userRepository.findByEmail(signupRequestDto.getEmail()).isPresent()){
+            if(memberRepository.findByEmail(signupRequestDto.getEmail()).isPresent()){
                 throw new RuntimeException("이미 가입된 유저입니다.");
             }
 
@@ -94,7 +95,7 @@ public class OauthService {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             birthday = dateFormat.parse(strBirthday);
 
-            User user = User.builder()
+            Member member = Member.builder()
                     .email(signupRequestDto.getEmail())
                     .password(password)
                     .name(signupRequestDto.getName())
@@ -104,7 +105,7 @@ public class OauthService {
                     .authority(Authority.ROLE_USER)
                     .build();
 
-            userRepository.save(user);
+            memberRepository.save(member);
 
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "회원가입에 성공했습니다.");
         } catch (Exception e) {
@@ -117,29 +118,29 @@ public class OauthService {
         카카오 로그인 및 회원가입
     */
     @Transactional
-    public ApiResponseDto<AuthResponseDto> kakaoLogin(AuthRequestDto authRequestDto) {
+    public ApiResponseDto kakaoLogin(AuthRequestDto authRequestDto) {
         try{
 
-            User kakaoUser = clientKakao.getUserData(authRequestDto.getAccessToken());
-            Long kakaoId = kakaoUser.getKakaoId();
+            Member kakaoMember = clientKakao.getUserData(authRequestDto.getAccessToken());
+            Long kakaoId = kakaoMember.getKakaoId();
 
-            if (userRepository.findByKakaoId(kakaoId) == null){
-                User user = User.builder()
-                        .kakaoId(kakaoUser.getKakaoId())
-                        .email(kakaoUser.getEmail())
-                        .name(kakaoUser.getName())
-                        .gender(kakaoUser.getGender())
+            if (memberRepository.findByKakaoId(kakaoId) == null){
+                Member member = Member.builder()
+                        .kakaoId(kakaoMember.getKakaoId())
+                        .email(kakaoMember.getEmail())
+                        .name(kakaoMember.getName())
+                        .gender(kakaoMember.getGender())
                         .authority(Authority.ROLE_USER)
                         .totalPaymentAmount(0L)
                         .build();
 
-                userRepository.save(user);
+                memberRepository.save(member);
 
             }
 
-            User user = userRepository.findByKakaoId(kakaoId);
+            Member member = memberRepository.findByKakaoId(kakaoId);
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getEmail(), member.getPassword());
 
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
@@ -151,7 +152,7 @@ public class OauthService {
                     tokenDto.getRefreshToken()
             );
 
-        return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "카카오 로그인에 성공했습니다. " + tokenDto);
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "카카오 로그인에 성공했습니다. " + tokenDto);
 
         }catch (Exception e){
             return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "카카오 로그인에 실패했습니다 " + e.getMessage());
@@ -198,7 +199,61 @@ public class OauthService {
         }
     }
 
-    public User getUserIdByEmail(String email){
-        return userRepository.findByEmail(email).orElseThrow(()->new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+    /*
+        유저 정보 수정
+    */
+    @Transactional
+    public ApiResponseDto updateUser(Long id, UpdateMemberRequestDto updateUserRequest, MultipartFile profileImage) {
+        try{
+
+            Member member = findMemberById(id);
+
+            String strBirthday = updateUserRequest.getYear() + "-" + updateUserRequest.getMonth() + "-" + updateUserRequest.getDay();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date birthday = dateFormat.parse(strBirthday);
+
+            String profileImageUrl = uploadS3MemberProfileImage(profileImage, id.toString());
+
+            if(profileImage != null) {
+                if (updateUserRequest.getPassword() != null) {
+                    String password = passwordEncoder.encode(updateUserRequest.getPassword());
+                    member.updateInfoWithImage(profileImageUrl, password, updateUserRequest.getName(),updateUserRequest.getPhoneNumber() ,birthday, updateUserRequest.getGender());
+                }
+                member.updateInfoNoPassWithImage(profileImageUrl, updateUserRequest.getName(), updateUserRequest.getPhoneNumber(), birthday, updateUserRequest.getGender());
+            } else{
+                if (updateUserRequest.getPassword() != null) {
+                    String password = passwordEncoder.encode(updateUserRequest.getPassword());
+                    member.updateInfo(password, updateUserRequest.getName(), updateUserRequest.getPhoneNumber(), birthday, updateUserRequest.getGender());
+                }
+                member.updateInfoNoPass(updateUserRequest.getName(), updateUserRequest.getPhoneNumber(), birthday, updateUserRequest.getGender());
+            }
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "사용자 정보 수정에 성공했습니다.");
+        } catch (Exception e){
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "사용자 정보 수정에 실패했습니다." + e.getMessage());
+        }
     }
+
+    /*
+        회원 탈퇴
+    */
+    public ApiResponseDto deleteUser(Long id) {
+        try {
+            memberRepository.delete(findMemberById(id));
+            return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "회원탈퇴를 성공했습니다.");
+
+        } catch (Exception e) {
+            return ApiResponseDto.of(ResponseStatusCode.FAIL.getValue(), "회원탈퇴에 실패했습니다.");
+        }
+
+    }
+
+    public Member findMemberById(Long id){
+        return memberRepository.findById(id).orElseThrow( () -> new IllegalArgumentException("없는 유저입니다.") );
+    }
+
+    public String uploadS3MemberProfileImage(MultipartFile profileImage, String bucketDir){
+        return itemS3Uploader.uploadLocal(profileImage, bucket+"/user/"+bucketDir);
+    }
+
+
 }

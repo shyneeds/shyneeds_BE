@@ -1,7 +1,7 @@
 package com.example.shyneeds_be.domain.cart.model.entity;
 
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.TravelPackage;
-import com.example.shyneeds_be.domain.user.model.entity.User;
+import com.example.shyneeds_be.domain.member.model.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,7 +54,7 @@ public class Cart { // 관심상품
     private TravelPackage travelPackage;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
 }

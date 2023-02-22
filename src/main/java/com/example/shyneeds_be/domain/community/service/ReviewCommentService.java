@@ -5,8 +5,8 @@ import com.example.shyneeds_be.domain.community.model.dto.request.ReviewCommentU
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewCommentResponseDto;
 import com.example.shyneeds_be.domain.community.model.entity.ReviewComment;
 import com.example.shyneeds_be.domain.community.repository.ReviewCommentRepository;
-import com.example.shyneeds_be.domain.user.model.entity.User;
-import com.example.shyneeds_be.domain.user.repository.UserRepository;
+import com.example.shyneeds_be.domain.member.model.entity.Member;
+import com.example.shyneeds_be.domain.member.repository.MemberRepository;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.Pagination;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
@@ -29,17 +29,17 @@ public class ReviewCommentService {
 
 
     private final ReviewCommentRepository reviewCommentRepository;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     // 댓글 등록하기
-    public ApiResponseDto register(User user, ReviewCommentRequestDto commentRequestDto) {
+    public ApiResponseDto register(Member member, ReviewCommentRequestDto commentRequestDto) {
         try{
 
-            userRepository.findById(user.getId()).orElseThrow(() -> new NoSuchElementException("회원정보를 찾을 수 없습니다."));
+            memberRepository.findById(member.getId()).orElseThrow(() -> new NoSuchElementException("회원정보를 찾을 수 없습니다."));
 
             ReviewComment newReviewComment = ReviewComment.builder()
                     .reviewId(commentRequestDto.getReviewId())
-                    .userId(user.getId())
+                    .userId(member.getId())
                     .comment(commentRequestDto.getComment())
                     .createdAt(Timestamp.valueOf(LocalDateTime.now()))
                     .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
@@ -67,12 +67,12 @@ public class ReviewCommentService {
     }
 
     // 댓글 불러오기
-    public ApiResponseDto<ReviewCommentResponseDto> getComment(User user, Long commentId) {
+    public ApiResponseDto<ReviewCommentResponseDto> getComment(Member member, Long commentId) {
         try{
 
             ReviewComment comment = reviewCommentRepository.findById(commentId).orElseThrow(() -> new NoSuchElementException("해당 댓글을 찾을 수 없습니다."));
 
-            if(comment.getUserId() != user.getId()){
+            if(comment.getUserId() != member.getId()){
                 return ApiResponseDto.of(ResponseStatusCode.UNAUTHORIZED.getValue(), "조회 권한이 없습니다.");
             }
             ReviewCommentResponseDto reviewCommentResponseDto = this.response(comment);
@@ -83,10 +83,10 @@ public class ReviewCommentService {
     }
 
     // 댓글 수정하기
-    public ApiResponseDto updateComment(User user, ReviewCommentUpdateRequestDto reviewCommentUpdateRequestDto){
+    public ApiResponseDto updateComment(Member member, ReviewCommentUpdateRequestDto reviewCommentUpdateRequestDto){
         try{
 
-            Long userId = user.getId();
+            Long userId = member.getId();
             Long commentId = reviewCommentUpdateRequestDto.getCommentId();
             String comment = reviewCommentUpdateRequestDto.getComment();
 
@@ -107,12 +107,12 @@ public class ReviewCommentService {
     }
 
     // 댓글 삭제하기
-    public ApiResponseDto deleteComment(User user, Long commentId){
+    public ApiResponseDto deleteComment(Member member, Long commentId){
         try{
 
             ReviewComment reviewComment = reviewCommentRepository.findById(commentId).orElseThrow(() -> new NoSuchElementException("댓글을 찾을 수 없습니다."));
 
-            if(reviewComment.getUserId() != user.getId()){
+            if(reviewComment.getUserId() != member.getId()){
                 return ApiResponseDto.of(ResponseStatusCode.UNAUTHORIZED.getValue(), "댓글 삭제 권한이 없습니다.");
             }
             ReviewComment deletedComment = reviewComment.delete();
@@ -130,11 +130,11 @@ public class ReviewCommentService {
         Long userId = null;
         String userName = "탈퇴회원";
 
-        Optional<User> optionalUser = userRepository.findById(reviewComment.getUserId());
+        Optional<Member> optionalUser = memberRepository.findById(reviewComment.getUserId());
         if(optionalUser.isPresent()){
-            User user = optionalUser.get();
-            userId = user.getId();
-            userName = user.getName();
+            Member member = optionalUser.get();
+            userId = member.getId();
+            userName = member.getName();
         }
 
         return ReviewCommentResponseDto.builder()

@@ -1,4 +1,4 @@
-package com.example.shyneeds_be.domain.user.model.dto.request;
+package com.example.shyneeds_be.domain.member.model.dto.request;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Builder
-public class UpdateUserRequestDto {
+public class UpdateMemberRequestDto {
 
     @ApiModelProperty(value = "예약할 패키지 리스트", required = true)
     private String password;

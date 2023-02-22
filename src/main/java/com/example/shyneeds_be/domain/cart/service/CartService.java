@@ -8,8 +8,8 @@ import com.example.shyneeds_be.domain.cart.model.entity.Cart;
 import com.example.shyneeds_be.domain.cart.repository.CartRepository;
 import com.example.shyneeds_be.domain.travel_package.model.entitiy.TravelPackage;
 import com.example.shyneeds_be.domain.travel_package.repository.TravelPackageRepository;
-import com.example.shyneeds_be.domain.user.model.entity.User;
-import com.example.shyneeds_be.domain.user.repository.UserRepository;
+import com.example.shyneeds_be.domain.member.model.entity.Member;
+import com.example.shyneeds_be.domain.member.repository.MemberRepository;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class CartService
 {
     private final CartRepository cartRepository;
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     private final TravelPackageRepository travelPackageRepository;
 
@@ -34,7 +34,7 @@ public class CartService
     */
     public ApiResponseDto addCart(Long userId, AddCartRequestDto addCartRequest) {
         try{
-            User user = userRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("없는 유저입니다."));
+            Member member = memberRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("없는 유저입니다."));
 
             for (AddCartPackageRequestDto addCartPackageRequest : addCartRequest.getAddCartList()) {
                 TravelPackage travelPackage = travelPackageRepository.findByPackageId(addCartPackageRequest.getProductId());
@@ -47,7 +47,7 @@ public class CartService
                                 .price(addCartPackageRequest.getPrice())
                                 .quantity(addCartPackageRequest.getQuantity())
                                 .travelPackage(travelPackage)
-                                .user(user)
+                                .member(member)
                                 .build()
                 );
             }
@@ -59,8 +59,8 @@ public class CartService
 @Transactional
     public ApiResponseDto<CartResponseDto> getCartList(Long userId) {
         try{
-            User user = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("없는 유저입니다."));
-            List<Cart> cartList = cartRepository.findAllByUserId(user.getId());
+            Member member = memberRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("없는 유저입니다."));
+            List<Cart> cartList = cartRepository.findAllByMemberId(member.getId());
             List<CartPackageResponseDto> cartPackageList = new ArrayList<>();
 
             for(Cart cart : cartList){

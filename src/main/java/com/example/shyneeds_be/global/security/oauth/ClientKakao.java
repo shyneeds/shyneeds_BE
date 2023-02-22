@@ -1,9 +1,9 @@
-package com.example.shyneeds_be.global.security.oauth.oauth;
+package com.example.shyneeds_be.global.security.oauth;
 
 
-import com.example.shyneeds_be.domain.user.model.entity.Authority;
-import com.example.shyneeds_be.domain.user.model.entity.User;
-import com.example.shyneeds_be.global.security.oauth.dto.KakaoUserResponseDto;
+import com.example.shyneeds_be.domain.member.model.entity.Authority;
+import com.example.shyneeds_be.domain.member.model.entity.Member;
+import com.example.shyneeds_be.domain.member.model.dto.response.KakaoUserResponseDto;
 import com.example.shyneeds_be.global.exception.TokenValidFailedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,7 @@ public class ClientKakao implements ClientProxy {
     private final WebClient webClient;
 
     @Override
-    public User getUserData(String accessToken) {
+    public Member getUserData(String accessToken) {
         KakaoUserResponseDto kakaoUserResponse = webClient.get()
                 .uri("https://kapi.kakao.com/v2/user/me")
                 .headers(h -> h.setBearerAuth(accessToken))
@@ -28,7 +28,7 @@ public class ClientKakao implements ClientProxy {
                 .bodyToMono(KakaoUserResponseDto.class)
                 .block();
 
-        return User.builder()
+        return Member.builder()
                 .kakaoId(kakaoUserResponse.getId())
                 .name(kakaoUserResponse.getProperties().getNickname())
                 .email(kakaoUserResponse.getKakao_account().getEmail())

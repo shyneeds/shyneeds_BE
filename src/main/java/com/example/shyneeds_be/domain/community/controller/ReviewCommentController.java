@@ -4,7 +4,7 @@ import com.example.shyneeds_be.domain.community.model.dto.request.ReviewCommentR
 import com.example.shyneeds_be.domain.community.model.dto.request.ReviewCommentUpdateRequestDto;
 import com.example.shyneeds_be.domain.community.model.dto.response.ReviewCommentResponseDto;
 import com.example.shyneeds_be.domain.community.service.ReviewCommentService;
-import com.example.shyneeds_be.domain.user.model.entity.User;
+import com.example.shyneeds_be.domain.member.model.entity.Member;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +29,10 @@ public class ReviewCommentController {
     @PostMapping("/register")
     public ApiResponseDto register(HttpServletRequest request, @RequestBody ReviewCommentRequestDto reviewCommentRequestDto) {
         Long userId = (Long) request.getAttribute("userId");
-        User user = User.builder()
+        Member member = Member.builder()
                 .id(userId)
                 .build();
-        return reviewCommentService.register(user, reviewCommentRequestDto);
+        return reviewCommentService.register(member, reviewCommentRequestDto);
     }
 
     @ApiOperation(value = "리뷰의 댓글 불러오기")
@@ -46,10 +46,10 @@ public class ReviewCommentController {
     @GetMapping("/{id}")
     public ApiResponseDto<ReviewCommentResponseDto> getComment(HttpServletRequest request,  @PathVariable("id") Long commentId){
         Long userId = (Long) request.getAttribute("userId");
-        User user = User.builder()
+        Member member = Member.builder()
                 .id(userId)
                 .build();
-        return reviewCommentService.getComment(user, commentId);
+        return reviewCommentService.getComment(member, commentId);
     }
 
 
@@ -58,20 +58,20 @@ public class ReviewCommentController {
     @PutMapping("/update")
     public ApiResponseDto updateComment(HttpServletRequest request, @RequestBody ReviewCommentUpdateRequestDto reviewCommentUpdateRequestDto){
         Long userId = (Long) request.getAttribute("userId");
-        User user = User.builder()
+        Member member = Member.builder()
                 .id(userId)
                 .build();
-        return reviewCommentService.updateComment(user, reviewCommentUpdateRequestDto);
+        return reviewCommentService.updateComment(member, reviewCommentUpdateRequestDto);
     }
 
     @ApiOperation(value = "댓글 삭제하기")
     @DeleteMapping("/{id}")
     public ApiResponseDto deleteComment(HttpServletRequest request, @PathVariable("id") Long commentId) {
         Long userId = (Long) request.getAttribute("userId");
-        User user = User.builder()
+        Member member = Member.builder()
                 .id(userId)
                 .build();
-        return reviewCommentService.deleteComment(user, commentId);
+        return reviewCommentService.deleteComment(member, commentId);
     }
 
 }

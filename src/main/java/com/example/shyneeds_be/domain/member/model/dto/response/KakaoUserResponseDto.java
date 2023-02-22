@@ -1,4 +1,4 @@
-package com.example.shyneeds_be.global.security.oauth.dto;
+package com.example.shyneeds_be.domain.member.model.dto.response;
 
 import lombok.*;
 
