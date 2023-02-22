@@ -1,5 +1,6 @@
 package com.example.shyneeds_be.domain.reservation.service;
 
+import com.example.shyneeds_be.domain.member.service.MemberService;
 import com.example.shyneeds_be.domain.reservation.model.dto.request.AddReservationRequestDto;
 import com.example.shyneeds_be.domain.reservation.model.dto.request.CancelReservationRequestDto;
 import com.example.shyneeds_be.domain.reservation.model.dto.request.ReservationPackageRequestDto;
@@ -15,6 +16,7 @@ import com.example.shyneeds_be.domain.member.repository.MemberRepository;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import com.example.shyneeds_be.global.network.response.ResponseStatusCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -31,12 +33,12 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final ReservationPackageRepository reservationPackageRepository;
     private final TravelPackageRepository travelPackageRepository;
+    private final MemberService memberService;
 
 //  예약하기
-    public ApiResponseDto addReservation(Long memberId, AddReservationRequestDto addReservationRequest){
+    public ApiResponseDto addReservation(User user, AddReservationRequestDto addReservationRequest){
         try {
-            Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("없는 사용자입니다."));
-
+            Member member = memberService.findMemberByJwt(user);
             Reservation reservation = Reservation.builder()
                     .paymentMethod(addReservationRequest.getPaymentMethod())
                     .paymentAccountBank(addReservationRequest.getPaymentAccountBank())
@@ -100,7 +102,6 @@ public class ReservationService {
     */
     public ApiResponseDto<ReservationDetailResponseDto> getReservationDetail(String reservationNumber) {
         try{
-            System.out.println(reservationRepository.findByReservationNumber(reservationNumber));
             if(reservationRepository.findByReservationNumber(reservationNumber) != null){
                 Reservation reservation = reservationRepository.findByReservationNumber(reservationNumber);
                 return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "예약 조회에 성공했습니다",
@@ -162,10 +163,12 @@ public class ReservationService {
         return reservationPackageDetaiList;
     }
 
-    public ApiResponseDto cancelReservation(Long memberId ,String reservationNumber, CancelReservationRequestDto cancelReservationRequest) {
+    public ApiResponseDto cancelReservation(User user ,String reservationNumber, CancelReservationRequestDto cancelReservationRequest) {
         try {
+            Member member = memberService.findMemberByJwt(user);
+
             if (reservationRepository.findByReservationNumber(reservationNumber) != null) {
-                if (reservationRepository.findAllByMemberId(memberId).contains(reservationRepository.findByReservationNumber(reservationNumber))) {
+                if (reservationRepository.findAllByMemberId(member.getId()).contains(reservationRepository.findByReservationNumber(reservationNumber))) {
                     Reservation reservation = reservationRepository.findByReservationNumber(reservationNumber);
                     reservation.cancelReservation(cancelReservationRequest.getCancelReason(), cancelReservationRequest.getCancelReasonDetail());
                     reservationRepository.save(reservation);

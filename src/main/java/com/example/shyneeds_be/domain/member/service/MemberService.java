@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -203,16 +204,16 @@ public class MemberService {
         유저 정보 수정
     */
     @Transactional
-    public ApiResponseDto updateUser(Long id, UpdateMemberRequestDto updateUserRequest, MultipartFile profileImage) {
+    public ApiResponseDto updateUser(User user, UpdateMemberRequestDto updateUserRequest, MultipartFile profileImage) {
         try{
 
-            Member member = findMemberById(id);
+            Member member = findMemberByJwt(user);
 
             String strBirthday = updateUserRequest.getYear() + "-" + updateUserRequest.getMonth() + "-" + updateUserRequest.getDay();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Date birthday = dateFormat.parse(strBirthday);
 
-            String profileImageUrl = uploadS3MemberProfileImage(profileImage, id.toString());
+            String profileImageUrl = uploadS3MemberProfileImage(profileImage, String.valueOf(member.getId()));
 
             if(profileImage != null) {
                 if (updateUserRequest.getPassword() != null) {
@@ -236,9 +237,9 @@ public class MemberService {
     /*
         회원 탈퇴
     */
-    public ApiResponseDto deleteUser(Long id) {
+    public ApiResponseDto deleteUser(User user) {
         try {
-            memberRepository.delete(findMemberById(id));
+            memberRepository.delete(findMemberByJwt(user));
             return ApiResponseDto.of(ResponseStatusCode.SUCCESS.getValue(), "회원탈퇴를 성공했습니다.");
 
         } catch (Exception e) {
@@ -247,13 +248,12 @@ public class MemberService {
 
     }
 
-    public Member findMemberById(Long id){
-        return memberRepository.findById(id).orElseThrow( () -> new IllegalArgumentException("없는 유저입니다.") );
-    }
-
     public String uploadS3MemberProfileImage(MultipartFile profileImage, String bucketDir){
         return itemS3Uploader.uploadLocal(profileImage, bucket+"/user/"+bucketDir);
     }
 
 
+    public Member findMemberByJwt(User user) {
+        return memberRepository.findById(Long.valueOf(user.getUsername())).orElseThrow( ()-> new IllegalArgumentException("없는 유저입니다.") );
+    }
 }

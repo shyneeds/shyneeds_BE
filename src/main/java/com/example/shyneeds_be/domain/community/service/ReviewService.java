@@ -12,6 +12,7 @@ import com.example.shyneeds_be.domain.community.model.entity.ReviewLikeCount;
 import com.example.shyneeds_be.domain.community.model.entity.VisitPackage;
 import com.example.shyneeds_be.domain.community.repository.ReviewLikeRepository;
 import com.example.shyneeds_be.domain.community.repository.ReviewRepository;
+import com.example.shyneeds_be.domain.member.service.MemberService;
 import com.example.shyneeds_be.domain.reservation.model.entity.Reservation;
 import com.example.shyneeds_be.domain.reservation.repository.ReservationRepository;
 import com.example.shyneeds_be.domain.travel_package.repository.TravelPackageRepository;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +42,7 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final ReservationRepository reservationRepository;
     private final TravelPackageRepository travelPackageRepository;
     private final ReviewLikeRepository reviewLikeRepository;
@@ -67,9 +70,9 @@ public class ReviewService {
 
 
     // 리뷰 등록
-    public ApiResponseDto register(Member member, ReviewRegisterRequestDto reviewRegisterRequestDto) {
+    public ApiResponseDto register(User user, ReviewRegisterRequestDto reviewRegisterRequestDto) {
         try{
-
+            Member member = memberService.findMemberByJwt(user);
 
             // 해당 유저의 예약확정 된 예약인지 확인
             Long memberId = member.getId();
@@ -163,8 +166,9 @@ public class ReviewService {
     }
 
     // [Mypage] 내가 작성한 리뷰 조회
-    public ApiResponseDto<List<ReviewMainResponseDto>> getMyReviewList(Member member, Pageable pageable) {
+    public ApiResponseDto<List<ReviewMainResponseDto>> getMyReviewList(User user, Pageable pageable) {
         try{
+            Member member = memberService.findMemberByJwt(user);
 
             Page<Review> userReviewList = reviewRepository.findByUserId(member.getId(), pageable);
 
@@ -179,10 +183,11 @@ public class ReviewService {
     }
 
     // 리뷰 상세 조회
-    public ApiResponseDto<ReviewResponseDto> getReview(Member member, Long reviewId) {
+    public ApiResponseDto<ReviewResponseDto> getReview(User user, Long reviewId) {
         try{
-            Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NoSuchElementException("해당 리뷰를 찾을 수 없습니다."));
+            Member member = memberService.findMemberByJwt(user);
 
+            Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NoSuchElementException("해당 리뷰를 찾을 수 없습니다."));
 
             // 조회수 증가
             Review increaseLookupReview = review.increaseLookup();
@@ -270,8 +275,9 @@ public class ReviewService {
     }
 
     // 리뷰 수정
-    public ApiResponseDto updateReview(Member member, ReviewUpdateRequestDto reviewUpdateRequestDto) {
+    public ApiResponseDto updateReview(User user, ReviewUpdateRequestDto reviewUpdateRequestDto) {
         try{
+            Member member = memberService.findMemberByJwt(user);
 
             Long userId = member.getId();
             Long reviewId = reviewUpdateRequestDto.getId();
@@ -299,8 +305,9 @@ public class ReviewService {
     }
 
     // 리뷰 삭제
-    public ApiResponseDto deleteReview(Member member, Long reviewId) {
+    public ApiResponseDto deleteReview(User user, Long reviewId) {
         try{
+            Member member = memberService.findMemberByJwt(user);
 
             memberRepository.findById(member.getId()).orElseThrow(() -> new NoSuchElementException("해당 유저 정보를 찾을 수 없습니다."));
             Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NoSuchElementException("리뷰 정보를 찾을 수 없습니다."));

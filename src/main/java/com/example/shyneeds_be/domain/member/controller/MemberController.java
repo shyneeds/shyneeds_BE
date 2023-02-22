@@ -5,6 +5,8 @@ import com.example.shyneeds_be.domain.member.service.MemberService;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,15 +45,15 @@ public class MemberController {
 
     @ApiOperation(value = "멤버 정보 수정 기능")
     @PatchMapping(value=  "/member",  consumes="multipart/form-data")
-    public ApiResponseDto updateUserInfo(HttpServletRequest req,
+    public ApiResponseDto updateUserInfo(@AuthenticationPrincipal User user,
                                          @RequestPart(value = "userInfo") UpdateMemberRequestDto updateUserRequest,
                                          @RequestPart("profileImage") MultipartFile profileImage){
-        return memberService.updateUser((Long)req.getAttribute("userId"), updateUserRequest, profileImage);
+        return memberService.updateUser(user, updateUserRequest, profileImage);
     }
 
     @ApiOperation(value = "회원 탈퇴 기능")
     @DeleteMapping("")
-    public ApiResponseDto deleteUser(HttpServletRequest req){
-        return memberService.deleteUser((Long)req.getAttribute("userId"));
+    public ApiResponseDto deleteUser(@AuthenticationPrincipal User user){
+        return memberService.deleteUser(user);
     }
 }

@@ -6,6 +6,8 @@ import com.example.shyneeds_be.domain.cart.service.CartService;
 import com.example.shyneeds_be.global.network.response.ApiResponseDto;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,13 +21,13 @@ public class CartController {
 
     @ApiOperation(value = "[유저] 장바구니 추가")
     @PostMapping("/user")
-    public ApiResponseDto addCart(HttpServletRequest req, @RequestBody AddCartRequestDto addCartRequest){
-        return cartService.addCart((Long)req.getAttribute("userId"), addCartRequest);
+    public ApiResponseDto addCart(@AuthenticationPrincipal User user, @RequestBody AddCartRequestDto addCartRequest){
+        return cartService.addCart(user, addCartRequest);
     }
 
     @ApiOperation(value = "[유저] 장바구니 조회")
     @GetMapping("/user")
-    public ApiResponseDto<CartResponseDto> getCartList(HttpServletRequest req){
-        return cartService.getCartList((Long)req.getAttribute("userId"));
+    public ApiResponseDto<CartResponseDto> getCartList(@AuthenticationPrincipal User user){
+        return cartService.getCartList(user);
     }
 }
